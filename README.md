@@ -21,7 +21,7 @@ Example for the testcase file provided in the package:
 
 cd inside the directory downloaded package directory METEORE then run
 ```
-python combination_model_prediction.py 	-a testcase/deepsignal_test.tsv -b testcase/nanopolish_test.tsv -m deepsignal_nanopolish -o [output_path] 
+python combination_model_prediction.py 	-a test_case/deepsignal_test.tsv -b test_case/nanopolish_test.tsv -m deepsignal_nanopolish -o [output_path] 
 
 ```
 
