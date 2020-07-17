@@ -1,5 +1,5 @@
 # METEORE
-MEthylation deTEction with nanopORE sequencing
+MEthylation deTEction with nanopORE sequencing                                         :stars:
 
 # Usage
 To make the predictions from combination model (deepsignal and nanopolish) format the input file (TSV) as below:
