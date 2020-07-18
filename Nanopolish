@@ -1,0 +1,70 @@
+
+"""
+rule single_to_multiFAST5:
+    input:
+        "data/{sample}"
+    output:
+        "multiFast5/{sample}"
+    shell:
+        "single_to_multi_fast5 -i {input} -s {output} -t 10 --recursive"
+"""
+rule index:
+    input:
+        f5="data/{sample}",
+        fq="{sample}.fastq"
+    output:
+        "{sample}.fastq.index",
+        "{sample}.fastq.index.fai",
+        "{sample}.fastq.index.gzi",
+        "{sample}.fastq.index.readdb"
+    shell:
+        "nanopolish index -d {input.f5} {input.fq}"
+
+rule minimap2:
+    input:
+        fa="data/ecoli_k12_mg1655.fasta",
+        fq="{sample}.fastq"
+    output:
+        "nanopolish_results/mapped/{sample}.bam"
+    shell:
+        "minimap2 -a -x map-ont {input.fa} {input.fq} | samtools sort -T tmp -o {output}"
+
+rule samtools_index:
+    input:
+        "nanopolish_results/mapped/{sample}.bam"
+    output:
+        "nanopolish_results/mapped/{sample}.bam.bai"
+    shell:
+        "samtools index {input}"
+
+rule call_methylation:
+    input:
+        bam="nanopolish_results/mapped/{sample}.bam",
+        bai="nanopolish_results/mapped/{sample}.bam.bai",
+        fa="data/ecoli_k12_mg1655.fasta",
+        fq="{sample}.fastq",
+        index="{sample}.fastq.index",
+        fai="{sample}.fastq.index.fai",
+        gzi="{sample}.fastq.index.gzi",
+        readdb="{sample}.fastq.index.readdb"
+    output:
+        "nanopolish_results/{sample}_nanopolish-log.tsv"
+    shell:
+        "nanopolish call-methylation -t 10 -r {input.fq} -b {input.bam} -g {input.fa} --progress > {output}"
+
+rule split_cpgs:
+    input:
+        "nanopolish_results/{sample}_nanopolish-log.tsv"
+    output:
+        "nanopolish_results/{sample}_nanopolish-log-perCG.tsv"
+    script:
+        "script/split_cpg_groups.py"
+
+rule calculate_frequency:
+    input:
+        script="script/run_nanopolish.R",
+        log="nanopolish_results/{sample}_nanopolish-log-perCG.tsv"
+    output:
+        "nanopolish_results/{sample}_nanopolish-freq-perCG.tsv"
+    shell:
+        "Rscript {input.script} {input.log} {output}"
