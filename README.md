@@ -58,12 +58,47 @@ snakemake -s Nanopolish nanopolish_results/example_nanopolish-freq-perCG.tsv
 This will produce the `nanopolish_results` output directory containing all output files. `example_nanopolish-log.tsv` is the raw output after running `nanopolish call-methylation`. `example_nanopolish-log-perCG.tsv` contains per-read per-site data, which splits up the CpG group containing multiple nearby sites into its constituent CpG sites. `example_nanopolish-freq-perCG.tsv` stores the per-site including the position of the CpG site on the reference genome, methylation frequency and coverage.
 
 ## DeepSignal (snakemake pipeline)
+The first step is to create the environment from the nanopolish.yml file:
+```
+conda env create -f deepsignal.yml
+```
+
+Then activate the Conda environment:
+```
+conda activate deepsignal_cpg_snakemake
+```
 
 Please download DeepSignal's trained model `model.CpG.R9.4_1D.human_hx1.bn17.sn360.v0.1.7+.tar.gz` [here](https://drive.google.com/drive/folders/1zkK8Q1gyfviWWnXUBMcIwEDw3SocJg7P)
+To extract a `model.CpG.R9.4_1D.human_hx1.bn17.sn360.v0.1.7+.tar.gz`to the `METEORE/data` directory
+```
+tar xvzf model.CpG.R9.4_1D.human_hx1.bn17.sn360.v0.1.7+.tar.gz -C /path/to/[METEORE/data]directory
+```
 
 A Snakefile named `Deepsignal` contains all rules in the Snakemake workflow. Run the snakemake:
 ```
 snakemake -s Deepsignal deepsignal_results/example_deepsignal-freq-perCG-comb.tsv
+```
+
+## Tombo (snakemake pipeline)
+
+The first step is to create the environment from the nanopolish.yml file:
+```
+conda env create -f tombo.yml
+```
+
+Then activate the Conda environment:
+```
+conda activate tombo_cpg_snakemake
+```
+
+A Snakefile named `Tombo` contains all rules in the Snakemake workflow. Run the snakemake:
+```
+snakemake -s Tombo example_tombo-mods-freqNcov-perCG.tsv
+```
+
+If you also want the per-read results from Tombo, you can run the following:
+```
+snakemake -s Tombo example_tombo_mods-scores-perRead.tsv
 ```
 
 ## Guppy
