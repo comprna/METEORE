@@ -55,7 +55,7 @@ A Snakefile named `Nanopolish` contains all rules in the Snakemake workflow. Run
 ```
 snakemake -s Nanopolish nanopolish_results/example_nanopolish-freq-perCG.tsv
 ```
-This will produce the `nanopolish_results` output directory containing all output files. `example_nanopolish-log.tsv` is the raw output after running `nanopolish call-methylation`. `example_nanopolish-log-perCG.tsv` contains per-read per-site data, which splits up the CpG group containing multiple nearby sites into its constituent CpG sites. `example_nanopolish-freq-perCG.tsv` stores the per-site including the position of the CpG site on the reference genome, methylation frequency and coverage.
+This will produce the `nanopolish_results` output directory containing all output files. `example_nanopolish-log.tsv` is the raw output after running `nanopolish call-methylation`. `example_nanopolish-log-perCG.tsv` contains per-read per-site data, which splits up the CpG group containing multiple nearby sites into its constituent CpG sites. `example_nanopolish-freq-perCG.tsv` stores the per-site data including the position of the CpG site on the reference genome, methylation frequency and coverage.
 
 ## DeepSignal (snakemake pipeline)
 The first step is to create the environment from the nanopolish.yml file:
@@ -68,8 +68,7 @@ Then activate the Conda environment:
 conda activate deepsignal_cpg_snakemake
 ```
 
-Please download DeepSignal's trained model `model.CpG.R9.4_1D.human_hx1.bn17.sn360.v0.1.7+.tar.gz` [here](https://drive.google.com/drive/folders/1zkK8Q1gyfviWWnXUBMcIwEDw3SocJg7P)
-To extract a `model.CpG.R9.4_1D.human_hx1.bn17.sn360.v0.1.7+.tar.gz`to the `METEORE/data` directory
+Please download DeepSignal's trained model `model.CpG.R9.4_1D.human_hx1.bn17.sn360.v0.1.7+.tar.gz` [here](https://drive.google.com/drive/folders/1zkK8Q1gyfviWWnXUBMcIwEDw3SocJg7P). To extract a `model.CpG.R9.4_1D.human_hx1.bn17.sn360.v0.1.7+.tar.gz`to the `METEORE/data` directory
 ```
 tar xvzf model.CpG.R9.4_1D.human_hx1.bn17.sn360.v0.1.7+.tar.gz -C /path/to/[METEORE/data]directory
 ```
@@ -78,6 +77,7 @@ A Snakefile named `Deepsignal` contains all rules in the Snakemake workflow. Run
 ```
 snakemake -s Deepsignal deepsignal_results/example_deepsignal-freq-perCG-comb.tsv
 ```
+This will produce the `deepsignal_results` output directory containing all output files. `example_deepsignal-prob.tsv` contains the per-read results including the position of the CpG site, read ID, strand, methylated probability, unmethylated probability etc. `example_deepsignal-freq-perCG.tsv` contains the per-site results using a Python script provided by `DeepSignal`. `example_deepsignal-freq-perCG-comb.tsv` also contains the per-site results but we combine the methylation calls from both strands into a single strand. 
 
 ## Tombo (snakemake pipeline)
 
@@ -108,4 +108,12 @@ Guppy basecaller is available to Oxford Nanopore Technologies' customers via the
 Once you have installed Guppy, you can perform modified basecalling from the signal data using the `dna_r9.4.1_450bps_modbases_dam-dcm-cpg_hac.cfg` guppy config.
 ```
 <path_to_ont-guppy-cpu/bin/guppy_basecaller --config dna_r9.4.1_450bps_modbases_dam-dcm-cpg_hac.cfg --fast5_out --input_path data/example/ --save_path guppy_results/example_guppyHacModbase/ --cpu_threads_per_caller 10
+```
+This will create a folder named `workspace` which contains basecalled fast5 files with modified base information.
+
+## Megalodon
+
+Please check out [Megalodon GiHub Page](https://github.com/nanoporetech/megalodon) for installation and more details.
+```
+megalodon data/example/ --outputs mods --reference data/ecoli_k12_mg1655.fasta --mod-motif Z CG 0 --write-mods-text --processes 10 --guppy-server-path ./<path/to/ont-guppy-cpu>/bin/guppy_basecall_server --guppy-params "--num_callers 10" --guppy-timeout 240 --overwrite
 ```
