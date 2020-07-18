@@ -10,8 +10,6 @@
 # 	-log-likelihood ratio <=-2.5, considered as unmethylated
 
 library(dplyr)
-library(ggplot2)
-library(forcats)
 library(plyr)
 library(data.table)
 library(reshape2)
@@ -35,7 +33,7 @@ df <- filter(df, Log.like.ratio >= 2.5 | Log.like.ratio <= -2.5)
 # Correct the coordinates
 df[df$Strand == "-", "Pos"] <- df[df$Strand == "-", "Pos"]+1
 
-# The position for same site on differnt stands repeats themselves, need to count no. of methylated CpG and unmethylated CpG using dlyr package
+# The position for same site on differnt stands repeats themselves, need to count no. of methylated CpG and unmethylated CpG using plyr package
 df_m <- count(df[df$Log.like.ratio > 0, ], c("Chr", "Pos","Strand"))
 df_unm <- count(df[df$Log.like.ratio < 0, ], c("Chr", "Pos","Strand"))
 colnames(df_m)[4] <- "Num.methylated"
@@ -63,4 +61,5 @@ df <- df[,list(df.freq = mean(df.freq),
                 list(Chr,Pos)]
 df <- data.frame(df)
 
+colnames(df) <- c("Chr", "Pos", "Methyl_freq", "Cov")
 write.table(df, file=args[2],  quote = FALSE, sep = "\t", col.names = TRUE, row.names = FALSE)
