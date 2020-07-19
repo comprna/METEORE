@@ -68,3 +68,12 @@ rule calculate_frequency:
         "nanopolish_results/{sample}_nanopolish-freq-perCG.tsv"
     shell:
         "Rscript {input.script} {input.log} {output}"
+
+rule create_input_for_comb_model:
+    input:
+        log="nanopolish_results/{sample}_nanopolish-log-perCG.tsv",
+        script="script/nanopolish_input_for_model.R"
+    output:
+        "nanopolish_results/{sample}_nanopolish-score.tsv"
+    shell:
+        "Rscript {input.script} {input.log} {output}"

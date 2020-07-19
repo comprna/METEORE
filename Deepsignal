@@ -31,3 +31,12 @@ rule combine_sites:
         "deepsignal_results/{sample}_deepsignal-freq-perCG-comb.tsv"
     shell:
         "Rscript {input.script} {input.freq} {output}"
+
+rule create_input_for_comb_model:
+    input:
+        prob="deepsignal_results/{sample}_deepsignal-prob.tsv",
+        script="script/deepsignal_input_for_model.R"
+    output:
+        "deepsignal_results/{sample}_deepsignal-score.tsv"
+    shell:
+        "Rscript {input.script} {input.prob} {output}"
