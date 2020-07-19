@@ -63,7 +63,7 @@ This will produce the `nanopolish_results` output directory containing all outpu
 * `example_nanopolish-log-perCG.tsv` contains per-read per-site data, which splits up the CpG group containing multiple nearby sites into its constituent CpG sites. 
 * `example_nanopolish-freq-perCG.tsv` stores the per-site data including the position of the CpG site on the reference genome, methylation frequency and coverage.
 
-You can also run the following to create and format the input file (TSV) for making predictions from the model:
+For your convenience, there is a rule in Snakemake to create the input file for making the predictions from the model:
 ```
 snakemake -s Nanopolish nanopolish_results/example_nanopolish-score.tsv
 ```
@@ -94,7 +94,7 @@ This will produce the `deepsignal_results` output directory containing all outpu
 * `example_deepsignal-freq-perCG.tsv` contains the per-site results using a Python script provided by `DeepSignal`. 
 * `example_deepsignal-freq-perCG-comb.tsv` also contains the per-site results but we combine the methylation calls from both strands into a single strand. 
 
-You can also run the following to create and format the input file (TSV) for making predictions from the model:
+For your convenience, there is a rule in Snakemake to create the input file for making the predictions from the model:  
 ```
 snakemake -s Deepsignal deepsignal_results/example_deepsignal-score.tsv
 ``` 
