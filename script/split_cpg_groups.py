@@ -35,7 +35,7 @@ with open(snakemake.input[0],'r') as fh:
         chrom = str(fields[0])
         strand = str(fields[1])
         start = int(fields[2]) + 1 # fix the position
-        read_name = str(fields[4])
+        read_name = str(fields[4]).split('_', 1)[0]
         logRatio = float(fields[5])
         cpg_num = int(fields[9])
         seq = str(fields[10])
