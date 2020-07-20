@@ -21,7 +21,7 @@ MEthylation deTEction with nanopORE sequencing                                  
 # Pipeline
 ----------------------------
 
-![Analysis pipeline](https://github.com/comprna/METEORE/figure/pipeline.png)
+![Analysis pipeline](https://github.com/comprna/METEORE/blob/master/figure/pipeline.png)
 **Fig 1. Pipeline for CpG methylation detection form nanopore sequencing data **
 
 
