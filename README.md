@@ -1,6 +1,41 @@
 # METEORE
 MEthylation deTEction with nanopORE sequencing                                         :stars:
 
+----------------------------
+# Table of Contents
+----------------------------
+
+   * [Pipeline](#pipeline)
+   * [Installation](#installation)
+
+
+
+
+----------------------------
+# Pipeline
+----------------------------
+
+![Image of Yaktocat](https://github.com/comprna/METEORE/pipeline.png)
+**Fig 1. Pipeline for CpG methylation detection form nanopore sequencing data **
+
+
+----------------------------
+# Installation
+----------------------------
+We recommand to install software dependencies via `Conda` on Linux. You can find Miniconda installation instructions for Linux [here](https://docs.conda.io/projects/conda/en/latest/user-guide/install/linux.html).
+Make sure you install the [Miniconda Python3 distribution](https://docs.conda.io/en/latest/miniconda.html#linux-installers).
+```
+wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+bash Miniconda3-latest-Linux-x86_64.sh
+``` 
+Accept the license terms during installation.
+
+Once you have installed Conda, you can download the Snakemake piplines and example datasets.
+```
+git clone https://github.com/comprna/METEORE.git
+```
+
+
 # Usage
 To make the predictions from combination model (deepsignal and nanopolish) format the input file (TSV) as below:
 ```
@@ -142,3 +177,40 @@ Please check out [Megalodon GitHub Page](https://github.com/nanoporetech/megalod
 ```
 megalodon data/example/ --outputs mods --reference data/ecoli_k12_mg1655.fasta --mod-motif Z CG 0 --write-mods-text --processes 10 --guppy-server-path ./<path/to/ont-guppy-cpu>/bin/guppy_basecall_server --guppy-params "--num_callers 10" --guppy-timeout 240 --overwrite
 ```
+
+# Usage
+To make the predictions from combination model (deepsignal and nanopolish) format the input file (TSV) as below:
+```
+ID                                        Pos    Strand    Score
+2f43696e-70f0-42dd-b23e-d9e0ea954d4f    2687804    -       29.64
+7ee0a989-c750-4dde-9114-354b97996dae    3104781    -       -4.47
+dc9dcb55-703c-4251-a916-4214abd67991    1173719    +        5.34
+2bea7f2a-f76c-491a-b5ee-b22c6f4a8539    1864274    -        5.33
+
+```
+**Command to run**
+
+```
+python combination_model_prediction.py  -a [fullpath_of_deepsignal_input_file] -b [fullpath_of_nanopolish_input_file] -m [model to use] -o [output_path]
+
+```
+Example for the testcase file provided in the package:
+
+cd inside the directory downloaded package directory METEORE then run
+```
+python combination_model_prediction.py  -a test_case/deepsignal_test.tsv -b test_case/nanopolish_test.tsv -m deepsignal_nanopolish -o [output_path]
+
+```
+
+**Output**
+
+The ouput after running combination_model_prediction.py script will contain predictions for the reads common to both deepsignal and nanopolish method. The
+format is as below:
+```
+ID                                        Pos       Prediction  Prob_methylation
+2f43696e-70f0-42dd-b23e-d9e0ea954d4f    2687804           0      0.02
+dc9dcb55-703c-4251-a916-4214abd67991    1173719           1      0.90
+2bea7f2a-f76c-491a-b5ee-b22c6f4a8539    1864274           0      0.45
+
+```
+
