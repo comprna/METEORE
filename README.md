@@ -129,7 +129,7 @@ If you also want the per-read results from Tombo, you can run the following:
 ```
 snakemake -s Tombo example_tombo_mods-scores-perRead.tsv
 ```
-Note that this can only extract per-read data for a region of interest. You may need to go to `script/extract_tomo_per_read_results.py` to specify your region of interest (chromosome, start position and end position) in the script and rerun the results.
+Note that this can only extract per-read data for a region of interest. You may need to go to `script/extract_tombo_per_read_results.py` to specify your region of interest (chromosome, start position and end position) in the script and rerun the results.
 
 ## Guppy
 
