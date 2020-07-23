@@ -7,7 +7,7 @@ import pandas as pd
 
 """
 	extract_tombo_per_read_results.py
-	Author: Dr Akanksha Srivastava. JCSMR, ANU
+	Author: Zaka Yuen JCSMR, ANU
 	Created on June 2020
 
 	Access the per-read statistics files using the template from here:
@@ -19,11 +19,11 @@ import pandas as pd
 
 # specify region of interest (plus strand), for example:
 reg_data_plus = tombo_helper.intervalData(
-    chrm='NC_000913.3', start=412305, end=4584088, strand="+")
+    chrm='NC_000913.3', start=111269, end=2864216, strand="+")
 
 # specify region of interest (minus strand), for example:
 reg_data_minus = tombo_helper.intervalData(
-    chrm='NC_000913.3', start=412305, end=4584088, strand="-")
+    chrm='NC_000913.3', start=111269, end=2864216, strand="-")
 
 # Plus strand
 sample_per_read_stats = tombo_stats.PerReadStats(snakemake.input[0])
@@ -41,5 +41,6 @@ minus["strand"] = "-"
 # Combine the results
 final=pd.concat([plus, minus])
 final.sort_values(["pos"], inplace=True)
-final.columns=["Pos", "Score", "Read_ID", "Strand"]
+final.columns=["Pos", "Score", "ID", "Strand"]
+final = final[["ID", "Pos", "Strand", "Score"]]
 final.to_csv(snakemake.output[0],sep="\t", header=True, index=False)
