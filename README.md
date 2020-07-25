@@ -12,8 +12,8 @@ a new predictive model that combines the outputs from two of the tools to produc
    * [Installation](#installation)
    * [Tutorial on an example dataset](#tutorial-on-an-example-dataset)
       * [Nanopolish snakemake pipeline](#nanopolish-snakemake-pipeline)
-      * [DeepSignal snakemake pipeline](#deespsignal-snakemake-pipeline)
-      * [Tombo snakemake pipeline](#nanopolish-snakemake-pipeline)
+      * [DeepSignal snakemake pipeline](#deepsignal-snakemake-pipeline)
+      * [Tombo snakemake pipeline](#tombo-snakemake-pipeline)
    * [Combined model usage](#combined-model-usage)
       * [Input file](#input-file)
       * [Command](#command)
@@ -25,7 +25,7 @@ a new predictive model that combines the outputs from two of the tools to produc
 ----------------------------
 
 ![Analysis pipeline](https://github.com/comprna/METEORE/blob/master/figure/pipeline.png)
-**Fig 1. Pipeline for CpG methylation detection form nanopore sequencing data **
+**Fig 1. Pipeline for CpG methylation detection form nanopore sequencing data**
 
 
 ----------------------------
@@ -137,7 +137,7 @@ Guppy basecaller is available to Oxford Nanopore Technologies' customers via the
 
 Once you have installed Guppy, you can perform modified basecalling from the signal data using the `dna_r9.4.1_450bps_modbases_dam-dcm-cpg_hac.cfg` guppy config.
 ```
-./<path_to_ont-guppy-cpu/bin/guppy_basecaller --config dna_r9.4.1_450bps_modbases_dam-dcm-cpg_hac.cfg --fast5_out --input_path data/example/ --save_path guppy_results/example_guppyHacModbase/ --cpu_threads_per_caller 10
+./<path_to_ont-guppy-cpu>/bin/guppy_basecaller --config dna_r9.4.1_450bps_modbases_dam-dcm-cpg_hac.cfg --fast5_out --input_path data/example/ --save_path guppy_results/example_guppyHacModbase/ --cpu_threads_per_caller 10
 ```
 This will create a folder named `workspace` which contains basecalled fast5 files with modified base information.
 
@@ -148,9 +148,16 @@ To process and analyse the Guppy's fast5 output, an open-source custom pipeline 
 
 Please check out [Megalodon GitHub Page](https://github.com/nanoporetech/megalodon) for more details. Note that the new release of Megalodon requires Guppy basecaller to be installed to run Megalodon.
 ```
-megalodon data/example/ --outputs mods --reference data/ecoli_k12_mg1655.fasta --mod-motif Z CG 0 --write-mods-text --processes 10 --guppy-server-path ./<path/to/ont-guppy-cpu>/bin/guppy_basecall_server --guppy-params "--num_callers 10" --guppy-timeout 240 --overwrite
+megalodon data/example/ --outputs mods --reference data/ecoli_k12_mg1655.fasta --mod-motif Z CG 0 --write-mods-text --processes 10 --guppy-server-path ./<path_to_ont-guppy-cpu>/bin/guppy_basecall_server --guppy-params "--num_callers 10" --guppy-timeout 240 --overwrite
 ```
 
+## DeepMod
+Please check out [DeepMod GitHub Page](https://github.com/WGLab/DeepMod) for installation instructions and usage.
+
+```
+# Set the working directory where you install DeepMod
+python bin/DeepMod.py detect --wrkBase <path_to_data_folder>/example/ --Ref <path_to_data_folder>/ecoli_k12_mg1655.fasta --outFolder <your_save_path>/deepmod_results --Base C --modfile train_mod/rnn_conmodC_P100wd21_f7ne1u0_4/mod_train_conmodC_P100wd21_f3ne1u0 --FileID example_deepmod --threads 10
+```
 --------------------------------------
 # Combined model usage
 --------------------------------------
@@ -169,16 +176,24 @@ dc9dcb55-703c-4251-a916-4214abd67991    1173719    +        5.34
 ## Command
 
 ```
-python combination_model_prediction.py  -a [fullpath_of_deepsignal_input_file] -b [fullpath_of_nanopolish_input_file] -m [model to use] -o [output_path]
+python combination_model_prediction.py  -a [fullpath_of_deepsignal_input_file] -b [fullpath_of_nanopolish_input_file] -m [model_to_use] -o [output_file]
 
 ```
 Example for the testcase file provided in the package:
 
 cd inside the directory downloaded package directory METEORE then run
 ```
-python combination_model_prediction.py  -a test_case/deepsignal_test.tsv -b test_case/nanopolish_test.tsv -m deepsignal_nanopolish -o [output_path]
+python combination_model_prediction.py  -a test_case/deepsignal_test.tsv -b test_case/nanopolish_test.tsv -m deepsignal_nanopolish -o [output_file]
 
 ```
+This command produces the `combined_model_results` output directory containing the output file. New results from subsequent runs will be saved into the same output directory.
+
+
+We also provide a Python script to convert per-site predictions at read-level into per-site predictions at genome level for the combined model.
+```
+python prediction_to_mod_frequency.py combined_model_results/[file_from_the_previous_step] combined_model_results/[output_file]
+```
+
 
 ## Output
 
@@ -191,4 +206,8 @@ dc9dcb55-703c-4251-a916-4214abd67991    1173719           1      0.90
 2bea7f2a-f76c-491a-b5ee-b22c6f4a8539    1864274           0      0.45
 
 ```
+Note that the prediction (0 refers to unmethylated and 1 refers to methylated) is made by using a threshold of 0.5. That is, if the P(methylation) is <= 0.5, it is predicted as unmethylated (0), otherwise as methylated (1).
+
+
+
 
