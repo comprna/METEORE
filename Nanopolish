@@ -58,11 +58,11 @@ rule split_cpgs:
     output:
         "nanopolish_results/{sample}_nanopolish-log-perCG.tsv"
     script:
-        "script/split_cpg_groups.py"
+        "script_in_snakemake/split_cpg_groups.py"
 
 rule calculate_frequency:
     input:
-        script="script/run_nanopolish.R",
+        script="script_in_snakemake/run_nanopolish.R",
         log="nanopolish_results/{sample}_nanopolish-log-perCG.tsv"
     output:
         "nanopolish_results/{sample}_nanopolish-freq-perCG.tsv"
@@ -72,7 +72,7 @@ rule calculate_frequency:
 rule create_input_for_comb_model:
     input:
         log="nanopolish_results/{sample}_nanopolish-log-perCG.tsv",
-        script="script/nanopolish_input_for_model.R"
+        script="script_in_snakemake/nanopolish_input_for_model.R"
     output:
         "nanopolish_results/{sample}_nanopolish-score.tsv"
     shell:

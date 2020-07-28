@@ -29,7 +29,7 @@ rule wig_to_tsv:
     output:
         "{sample}_tombo-mods-freqOnly.tsv"
     script:
-        "script/wig2bed.py"
+        "script_in_snakemake/wig2bed.py"
 
 rule bedgraph_to_tsv:
     input:
@@ -38,11 +38,11 @@ rule bedgraph_to_tsv:
     output:
         "{sample}_tombo-covOnly.tsv"
     script:
-        "script/bedgraph2bed.py"
+        "script_in_snakemake/bedgraph2bed.py"
 
 rule combine_freq_and_cov:
     input:
-        script="script/run_tombo.R",
+        script="script_in_snakemake/run_tombo.R",
         freq="{sample}_tombo-mods-freqOnly.tsv",
         cov="{sample}_tombo-covOnly.tsv"
     output:
@@ -56,4 +56,4 @@ rule extract_per_read_results:
     output:
         "{sample}_tombo_mods-scores-perRead.tsv"
     script:
-        "script/extract_tombo_per_read_results.py"
+        "script_in_snakemake/extract_tombo_per_read_results.py"
