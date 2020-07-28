@@ -1,16 +1,3 @@
-"""
-Once you have done modified basecalling with Guppy, you will have the basecalled fastq file(s) and a directory called workspace generated.
-
-Working directory: guppy_results/, the directory where the all basecalled results are saved (defined by the --save_path when modified basecalling with Guppy)
-
-Before running the Snakmake pipeline:
-    -If you have more than 1 fastq file generated, please concatenate files first
-        cat *.fastq > sample.fq
-    -If only one fastq file, rename that file
-	mv [original_fastq_file_with_long_filename] sample.fq
-    -Download the scripts to convert CpG methylation from fast5s to reference anchored calls
-        git clone https://github.com/kpalin/gcf52ref.git
-"""
 rule minimap2:
     input:
         fa="data/ecoli_k12_mg1655.fasta",

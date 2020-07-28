@@ -14,6 +14,7 @@ a new predictive model that combines the outputs from two of the tools to produc
       * [Nanopolish snakemake pipeline](#nanopolish-snakemake-pipeline)
       * [DeepSignal snakemake pipeline](#deepsignal-snakemake-pipeline)
       * [Tombo snakemake pipeline](#tombo-snakemake-pipeline)
+      * [Guppy snakemake pipeline](#guppy-snakemake-pipeline)
    * [Combined model usage](#combined-model-usage)
       * [Input file](#input-file)
       * [Command](#command)
@@ -159,7 +160,7 @@ git clone https://github.com/kpalin/gcf52ref.git
 
 Then you can create the environment from the `guppy.yml` file:
 ```
-conda env create -f nanopolish.yml
+conda env create -f guppy.yml
 ```
 Then activate the Conda environment:
 ```
