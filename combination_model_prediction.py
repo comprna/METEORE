@@ -7,7 +7,7 @@ Created on Thu Jul  9 18:03:39 2020
 
 import pandas as pd
 import numpy as np
-import pickle
+import joblib
 from itertools import combinations 
 import sklearn
 from functools import reduce
@@ -41,24 +41,17 @@ def mod_file(data_file_path):
     
 def main(mp,combine_file):
     
-    loaded_model = pickle.load(open(mp, 'rb'))
+    loaded_model = joblib.load(open(mp, 'rb'))
     X=combine_file[combine_file.columns[2:]]
     X=sklearn.preprocessing.MinMaxScaler().fit_transform(X)
     prediction=pd.DataFrame(loaded_model.predict(X))
     prediction_prob=pd.DataFrame(loaded_model.predict_proba(X))
-    prediction.rename(columns={0:"Prediction"}, inplace=True)
+    prediction.rename(columns={0:"prediction"}, inplace=True)
     prediction_prob=prediction_prob[[1]]
-    prediction_prob.rename(columns={1:"Prob_methylation"}, inplace=True)
+    prediction_prob.rename(columns={1:"prob_methylation"}, inplace=True)
     final_output=pd.concat([combine_file[combine_file.columns[:2]],prediction,prediction_prob], axis=1)
-    final_output["Pos"] = final_output["Pos"].apply(np.int64) # Covert float into integer for Pos column
-    #os.makedirs(options.output) 
-    #final_output.to_csv(options.output+'/predictions_combination_method.tsv', header=True, index=None, sep='\t')
-    dir = ("combined_model_results")
-    if not os.path.isdir(dir):
-        os.makedirs(dir)
-        final_output.to_csv(dir+'/'+options.output, header=True, index=None, sep='\t')
-    else:
-        final_output.to_csv(dir+'/'+options.output, header=True, index=None, sep='\t')
+    os.makedirs(options.output) 
+    final_output.to_csv(options.output+'/predictions_combination_method.tsv', header=True, index=None, sep='\t')
    
 if __name__ == '__main__':
      
