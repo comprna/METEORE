@@ -162,6 +162,14 @@ python bin/DeepMod.py detect --wrkBase <path_to_data_folder>/example/ --Ref <pat
 # Combined model usage
 --------------------------------------
 
+Before running the below command please make sure you install the required libraries in the conda env
+
+```
+pip install -r requirements.txt
+
+```
+
+
 ## Input file
 To make the predictions from combination model (deepsignal and nanopolish) format the input file (TSV) as below:
 ```
