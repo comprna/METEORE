@@ -7,7 +7,7 @@ Created on Thu Jul  9 18:03:39 2020
 
 import pandas as pd
 import numpy as np
-import joblib
+import pickle
 from itertools import combinations 
 import sklearn
 from functools import reduce
@@ -17,13 +17,12 @@ import os
     
 parser = argparse.ArgumentParser(description = 'Prediction from combined models for the reads.')
 
-parser.add_argument('--deepsignalfilepath','-a', type = str, required = True,
-    help = 'Path to deepsignal output tsv file in the format [ID, Pos,Strand,Score]. Can be compressed in gz.')  
+parser.add_argument('--methodsfile','-i', type = str, required = True,
+    help = 'TSV file containing name and path of the method output tsv file. The output tsv file from the method should be in the format [ID, Pos,Strand,Score]. Can be compressed in gz.')  
 
-parser.add_argument('--nanopolishfilepath','-b', type = str, required = True,
-    help = 'Path to nanopolish output tsv file in the format [ID, Pos, Strand,Score]. Can be compressed in gz.')  
-parser.add_argument('--model','-m', choices=["deepsignal_nanopolish_default","deepsignal_nanopolish","all_default","all"],required=True, type=str,
-   help = 'which model to select from')
+parser.add_argument('--model','-m', choices=["default","optimized"],required=True, type=str,
+   help = 'which model to select from default RF or optimized RF with max_depth 3 and n_estimator 10')
+
 parser.add_argument('--output', '-o',type = str, required = True,
 		help = 'Where to store the outputs')
 options = parser.parse_args()
@@ -42,8 +41,8 @@ def mod_file(data_file_path):
     
 def main(mp,combine_file):
     
-    loaded_model = joblib.load(open(mp, 'rb'))
-    X=combine_file[combine_file.columns[-2:]]
+    loaded_model = pickle.load(open(mp, 'rb'))
+    X=combine_file[combine_file.columns[2:]]
     X=sklearn.preprocessing.MinMaxScaler().fit_transform(X)
     prediction=pd.DataFrame(loaded_model.predict(X))
     prediction_prob=pd.DataFrame(loaded_model.predict_proba(X))
@@ -55,27 +54,19 @@ def main(mp,combine_file):
     final_output.to_csv(options.output+'/predictions_combination_method.tsv', header=True, index=None, sep='\t')
    
 if __name__ == '__main__':
-      
-     selected_model=options.model
      
-     if selected_model=="deepsignal_nanopolish_default":
-         mp="saved_models/rf_model_default_deepsignal_nanopolish.model"
-         deepsignal= mod_file(options.deepsignalfilepath)
-         nanopolish= mod_file(options.nanopolishfilepath)
-         combine_file=pd.merge(deepsignal,nanopolish, how='inner',on=["ID","Pos"])
-         combine_file.drop_duplicates(subset=["ID","Pos"],inplace=True)
-         combine_file.reset_index(inplace=True,drop=True)
-         main(mp,combine_file)
-     if selected_model=="deepsignal_nanopolish": 
-         mp="saved_models/rf_model_max_depth_3_n_estimator_10_deepsignal_nanopolish.model"
-         deepsignal= mod_file(options.deepsignalfilepath)
-         nanopolish= mod_file(options.nanopolishfilepath)
-         combine_file=pd.merge(deepsignal,nanopolish, how='inner',on=["ID","Pos"])
-         combine_file.drop_duplicates(subset=["ID","Pos"],inplace=True)
-         combine_file.reset_index(inplace=True,drop=True)
-         main(mp,combine_file)
-
-#
-#
-#
-#    
+     df_file=pd.read_csv(options.methodsfile,header=None, sep='\t')
+     if options.model=="default":
+         fillval="default"
+     else:
+         fillval="max_depth_3_n_estimator_10"
+     modelname='_'.join(df_file[0])
+     mp='saved_models/rf_model_'+fillval+'_'+modelname+'.model'
+     dfs=[]
+     for i in df_file[1]:
+         dfs.append(mod_file(i))
+     combine_file=reduce(lambda left,right: pd.merge(left, right, how='inner',on=["ID","Pos"]), dfs)
+     combine_file.drop_duplicates(subset=["ID","Pos"],inplace=True)
+     combine_file.reset_index(inplace=True,drop=True)
+     main(mp,combine_file)
+  
