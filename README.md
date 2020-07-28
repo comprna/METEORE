@@ -211,5 +211,14 @@ dc9dcb55-703c-4251-a916-4214abd67991    1173719           1      0.90
 Note that the prediction (0 refers to unmethylated and 1 refers to methylated) is made by using a threshold of 0.5. That is, if the P(methylation) is <= 0.5, it is predicted as unmethylated (0), otherwise as methylated (1).
 
 
+## train your own model and save
 
+We provide the script to train the combine model yourself and save it
+
+## Command
+
+```
+python combination_model_train.py  -d [path of deepsignal file] -n [path of nanopolish file] -g [path of guppy file] -m [path of megalodon file] -t [path of tombo file] -c [number of methods to combine together for training (range from 2-5)] -o [output_path_to_save_model]
+
+```
 
