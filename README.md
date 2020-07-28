@@ -90,7 +90,7 @@ conda activate deepsignal_cpg_snakemake
 Please download DeepSignal's trained model `model.CpG.R9.4_1D.human_hx1.bn17.sn360.v0.1.7+.tar.gz` [here](https://drive.google.com/drive/folders/1zkK8Q1gyfviWWnXUBMcIwEDw3SocJg7P). 
 To extract a `model.CpG.R9.4_1D.human_hx1.bn17.sn360.v0.1.7+.tar.gz`to the `METEORE/data` directory:
 ```
-tar xvzf model.CpG.R9.4_1D.human_hx1.bn17.sn360.v0.1.7+.tar.gz -C /path/to/[METEORE/data]directory
+tar xvzf model.CpG.R9.4_1D.human_hx1.bn17.sn360.v0.1.7+.tar.gz -C <path_to_METEORE/data_diectory>
 ```
 
 A Snakefile named `Deepsignal` contains all rules in the Snakemake workflow. Run the snakemake:
@@ -131,18 +131,44 @@ snakemake -s Tombo example_tombo_mods-scores-perRead.tsv
 ```
 Note that this can only extract per-read data for a region of interest. You may need to go to `script/extract_tombo_per_read_results.py` to specify your region of interest (chromosome, start position and end position) in the script and rerun the results.
 
-## Guppy
+## Guppy Snakemake pipeline
 
-Guppy basecaller is available to Oxford Nanopore Technologies' customers via the community site. For download and installation instructions, please check out [here](https://community.nanoporetech.com/downloads)
+You need to basecall with the standalone Guppy basecaller yourself before running the Snakemake pipeline. The pipeline was only designed to process and analyse the Guppy's fast5 output using the open-source custom scripts available from https://github.com/kpalin/gcf52ref
+Guppy basecaller is only available to Oxford Nanopore Technologies' customers via the community site. For download and installation instructions, please check out [here](https://community.nanoporetech.com/downloads)
 
 Once you have installed Guppy, you can perform modified basecalling from the signal data using the `dna_r9.4.1_450bps_modbases_dam-dcm-cpg_hac.cfg` guppy config.
 ```
-./<path_to_ont-guppy-cpu>/bin/guppy_basecaller --config dna_r9.4.1_450bps_modbases_dam-dcm-cpg_hac.cfg --fast5_out --input_path data/example/ --save_path guppy_results/example_guppyHacModbase/ --cpu_threads_per_caller 10
+./<path_to_ont-guppy-cpu>/bin/guppy_basecaller --config dna_r9.4.1_450bps_modbases_dam-dcm-cpg_hac.cfg --fast5_out --input_path data/example/ --save_path guppy_results/ --cpu_threads_per_caller 10
 ```
-This will create a folder named `workspace` which contains basecalled fast5 files with modified base information.
+Once you have done modified basecalling with Guppy, the output files will be saved to the `guppy_results` folder where you will find the basecalled fastq file(s) and a folder named `workspace` which contains basecalled fast5 files with modified base information.
 
-To process and analyse the Guppy's fast5 output, an open-source custom pipeline is used: https://github.com/kpalin/gcf52ref
 
+Before running the Snakmake pipeline, you need to prepare the following files:
+* If you have more than 1 fastq files generated, please concatenate these files first
+```
+cat *.fastq > example.fq
+```
+* If only one fastq file, rename that file
+```
+mv [original_fastq_file_with_long_filename] example.fq
+```
+* Go to `guppy_results` directory and download the scripts that convert CpG methylation from fast5s to reference anchored calls
+```
+git clone https://github.com/kpalin/gcf52ref.git
+```
+
+Then you can create the environment from the `guppy.yml` file:
+```
+conda env create -f nanopolish.yml
+```
+Then activate the Conda environment:
+```
+conda activate guppy_cpg_snakemake
+```
+A Snakefile named Guppy contains all rules in the Snakemake workflow. Run the snakemake:
+```
+snakemake -s Guppy guppy_results/example_guppy-freq-perCG.tsv
+```
 
 ## Megalodon
 
