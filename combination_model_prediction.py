@@ -7,7 +7,7 @@ Created on Thu Jul  9 18:03:39 2020
 
 import pandas as pd
 import numpy as np
-import pickle
+import joblib
 from itertools import combinations 
 import sklearn
 from functools import reduce
@@ -41,7 +41,7 @@ def mod_file(data_file_path):
     
 def main(mp,combine_file):
     
-    loaded_model = pickle.load(open(mp, 'rb'))
+    loaded_model = joblib.load(open(mp, 'rb'))
     X=combine_file[combine_file.columns[2:]]
     X=sklearn.preprocessing.MinMaxScaler().fit_transform(X)
     prediction=pd.DataFrame(loaded_model.predict(X))
