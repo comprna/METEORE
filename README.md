@@ -162,6 +162,14 @@ python bin/DeepMod.py detect --wrkBase <path_to_data_folder>/example/ --Ref <pat
 # Combined model usage
 --------------------------------------
 
+Before running the below command please make sure you install the required libraries in the conda env
+
+```
+pip install -r requirements.txt
+
+```
+
+
 ## Input file
 To make the predictions from combination model (deepsignal and nanopolish) format the input file (TSV) as below:
 ```
@@ -176,16 +184,18 @@ dc9dcb55-703c-4251-a916-4214abd67991    1173719    +        5.34
 ## Command
 
 ```
-python combination_model_prediction.py  -a [fullpath_of_deepsignal_input_file] -b [fullpath_of_nanopolish_input_file] -m [model_to_use] -o [output_file]
+python combination_model_prediction.py  -i [path of tsv file containing methods name and path] -m [model_to_use (default or optimized)] -o [output_file]
 
 ```
 Example for the testcase file provided in the package:
 
 cd inside the directory downloaded package directory METEORE then run
 ```
-python combination_model_prediction.py  -a test_case/deepsignal_test.tsv -b test_case/nanopolish_test.tsv -m deepsignal_nanopolish -o [output_file]
+python combination_model_prediction.py  -i samples.tsv -m optimized -o [output_file]
 
 ```
+**Note**: The order of method name in the samples.tsv file should be same as the order of saved model name. For example the saved model name is *'rf_model_default_**deepsignal_nanopolish**.model'* so the order in the *samples.tsv* file is **deepsignal and then nanopolish** and not the other way round.
+
 This command produces the `combined_model_results` output directory containing the output file. New results from subsequent runs will be saved into the same output directory.
 
 
@@ -209,5 +219,14 @@ dc9dcb55-703c-4251-a916-4214abd67991    1173719           1      0.90
 Note that the prediction (0 refers to unmethylated and 1 refers to methylated) is made by using a threshold of 0.5. That is, if the P(methylation) is <= 0.5, it is predicted as unmethylated (0), otherwise as methylated (1).
 
 
+## train your own model and save
 
+We provide the script to train the combine model yourself and save it
+
+## Command
+
+```
+python combination_model_train.py  -d [path of deepsignal file] -n [path of nanopolish file] -g [path of guppy file] -m [path of megalodon file] -t [path of tombo file] -c [number of methods to combine together for training (range from 2-5)] -o [output_path_to_save_model]
+
+```
 
