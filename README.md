@@ -141,7 +141,7 @@ Once you have installed Guppy, you can perform modified basecalling from the sig
 ```
 ./<path_to_ont-guppy-cpu>/bin/guppy_basecaller --config dna_r9.4.1_450bps_modbases_dam-dcm-cpg_hac.cfg --fast5_out --input_path data/example/ --save_path guppy_results/ --cpu_threads_per_caller 10
 ```
-Once you have done modified basecalling with Guppy, the output files will be saved to the `guppy_results` folder where you will find the basecalled fastq file(s) and a folder named `workspace` which contains basecalled fast5 files with modified base information.
+Once you have done modified basecalling with Guppy, the output files will be saved to the `guppy_results` directory where you will find the logs, basecalled fastq file(s) and a folder named `workspace` which contains basecalled fast5 files with modified base information.
 
 
 Before running the Snakmake pipeline, you need to prepare the following files:
@@ -176,6 +176,13 @@ snakemake -s Guppy guppy_results/example_guppy-freq-perCG.tsv
 Please check out [Megalodon GitHub Page](https://github.com/nanoporetech/megalodon) for more details. Note that the new release of Megalodon requires Guppy basecaller to be installed to run Megalodon.
 ```
 megalodon data/example/ --outputs mods --reference data/ecoli_k12_mg1655.fasta --mod-motif Z CG 0 --write-mods-text --processes 10 --guppy-server-path ./<path_to_ont-guppy-cpu>/bin/guppy_basecall_server --guppy-params "--num_callers 10" --guppy-timeout 240 --overwrite
+```
+This will produce the `megalodon_results` directory which contains logs, per-read modified base output `per_read_modified_base_calls.txt`, per-site modified base output `modified_bases.5mC.bed`.
+
+ 
+You can obtain a methylation frequency file by running the script `script/run_megalodon.R` with Megalodon's per-site modified base output `modified_bases.5mC.bed`. This script combines the sites from both strands by averaging out methylation frequencies nad adding up the coverage.
+```
+Rscript script/run_megalodon.R megalodon_results/modified_bases.5mC.bed  megalodon_results/example_megalodon_freq-perCG.tsv
 ```
 
 ## DeepMod
