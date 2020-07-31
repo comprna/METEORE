@@ -1,5 +1,7 @@
-# METEORE
-MEthylation deTEction with nanopORE sequencing                                         :stars:
+![Analysis pipeline](https://github.com/comprna/METEORE/blob/master/figure/meteore_logo_white.png)
+# METEORE: MEthylation deTEction with nanopORE sequencing                                         :stars:
+
+**About METEORE**
 
 METEORE provides snakemake pipelines for various tools to detect DNA methylation from Nanopore sequencing reads. Additionally, it provides 
 a new predictive model that combines the outputs from two of the tools to produce a consensus prediction with higher accuracy than the individual tools.
