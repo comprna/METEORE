@@ -20,7 +20,7 @@ a new predictive model that combines the outputs from two of the tools to produc
    * [Combined model usage](#combined-model-usage)
       * [Input file](#input-file)
       * [Command](#command)
-      * [Output](#output)
+      * [Per site predictions](#per-site-predictions)
 
 
 ----------------------------
@@ -245,16 +245,8 @@ python combination_model_prediction.py  -i samples.tsv -m optimized -o [output_f
 ```
 **Note**: The order of method name in the samples.tsv file should be same as the order of saved model name. For example the saved model name is *'rf_model_default_**deepsignal_nanopolish**.model'* so the order in the *samples.tsv* file is **deepsignal and then nanopolish** and not the other way round.
 
-This command produces the `combined_model_results` output directory containing the output file. New results from subsequent runs will be saved into the same output directory.
+This command produces the a directory called `combined_model_results` containing the output file. New results from subsequent runs will be saved into the same output directory.
 
-
-We also provide a Python script to convert per-site predictions at read-level into per-site predictions at genome level for the combined model.
-```
-python prediction_to_mod_frequency.py combined_model_results/[file_from_the_previous_step] combined_model_results/[output_file]
-```
-
-
-## Output
 
 The ouput after running combination_model_prediction.py script will contain predictions for the reads common to both deepsignal and nanopolish method. The
 format is as below:
@@ -268,14 +260,29 @@ dc9dcb55-703c-4251-a916-4214abd67991    1173719           1      0.90
 Note that the prediction (0 refers to unmethylated and 1 refers to methylated) is made by using a threshold of 0.5. That is, if the P(methylation) is <= 0.5, it is predicted as unmethylated (0), otherwise as methylated (1).
 
 
-## train your own model and save
+## Per-site predictions
 
-We provide the script to train the combine model and save it
+We also provide a Python script to convert the per-site predictions for each individual read (methylated / unmethylated) into per-site predictions at genome level (% methylation) by summarising the predictions on individual reads from the model:
 
-## Command
+```
+python prediction_to_mod_frequency.py combined_per_site_per_read_results combined_per_site_results
+```
+Where the file `combined_per_site_per_read_results` is the output file from the previous step, and `combined_per_site_results` is the new output with the percentage methylation per genomic position. 
+
+Example output of this command:
+
+## train your own model
+
+We provide the script to train a combined model from the per-read and per-site output from any number of methods (from 2 to 5). For instance, the command to train a model with 5 methods would be:
 
 ```
 python combination_model_train.py  -d [path of deepsignal file] -n [path of nanopolish file] -g [path of guppy file] -m [path of megalodon file] -t [path of tombo file] -c [number of methods to combine together for training (range from 2-5)] -o [output_path_to_save_model]
+```
+
+The command to train a model with Nanopolish and Megalodon would be:
 
 ```
+python combination_model_train.py  -n [path of nanopolish file] -m [path of megalodon file] -c 2 -o [output_path_to_save_model]
+```
+
 
