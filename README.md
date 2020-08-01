@@ -136,8 +136,8 @@ Note that this can only extract per-read data for a region of interest. You may 
 
 ## Guppy Snakemake pipeline
 
-You need to basecall with the standalone Guppy basecaller yourself before running the Snakemake pipeline. The pipeline was only designed to process and analyse the Guppy's fast5 output using the open-source custom scripts available from https://github.com/kpalin/gcf52ref
-Guppy basecaller is only available to Oxford Nanopore Technologies' customers via the community site. For download and installation instructions, please check out [here](https://community.nanoporetech.com/downloads)
+You need to basecall with the standalone Guppy basecaller before running the Snakemake pipeline. The pipeline was only designed to process and analyse the Guppy's fast5 output using the open-source custom scripts available from https://github.com/kpalin/gcf52ref
+Guppy basecaller is only available to Oxford Nanopore Technologies' customers via the community site. For download and installation instructions, please check their [website](https://community.nanoporetech.com/downloads)
 
 Once you have installed Guppy, you can perform modified basecalling from the signal data using the `dna_r9.4.1_450bps_modbases_dam-dcm-cpg_hac.cfg` guppy config.
 ```
@@ -206,7 +206,10 @@ Note that DeepMod does not produce per-read predictions, so we could not produce
 # Combined model usage
 --------------------------------------
 
-Before running the below command please make sure you install the required libraries in the conda env
+We have trained Random Forest models that combine the outputs from two of the methods above
+to produce consensus predictions with improved accuracy. 
+
+First of all, please make sure you install the required libraries in the conda env
 
 ```
 pip install -r requirements.txt
@@ -215,7 +218,7 @@ pip install -r requirements.txt
 
 
 ## Input file
-To make the predictions from combination model (deepsignal and nanopolish) format the input file (TSV) as below:
+To make the predictions from combination model (e.g. deepsignal and nanopolish) the input (.tsv) file from each method must be formatted as below:
 ```
 ID                                        Pos    Strand    Score
 2f43696e-70f0-42dd-b23e-d9e0ea954d4f    2687804    -       29.64
@@ -224,6 +227,8 @@ dc9dcb55-703c-4251-a916-4214abd67991    1173719    +        5.34
 2bea7f2a-f76c-491a-b5ee-b22c6f4a8539    1864274    -        5.33
 
 ```
+where the score is the significance score given by each method. In our snakemake pipelines, this score is generated as described above. Nanopolish 
+and Guppy provide a log-likelihood ratio value per site and per read. Similarly, Tombo produces a significance value per site and per read. On the other hand, for DeepSignal we give the log-ratio of the probabilities for a site to be methylated over the probablity of being unmethylated for each read. Similarly, for Megalodon we give the difference of the log-probabilities to obtain a log-ratio. 
 
 ## Command
 
@@ -265,7 +270,7 @@ Note that the prediction (0 refers to unmethylated and 1 refers to methylated) i
 
 ## train your own model and save
 
-We provide the script to train the combine model yourself and save it
+We provide the script to train the combine model and save it
 
 ## Command
 
