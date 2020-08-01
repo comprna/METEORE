@@ -21,6 +21,8 @@ a new predictive model that combines the outputs from two of the tools to produc
       * [Input file](#input-file)
       * [Command](#command)
       * [Per site predictions](#per-site-predictions)
+      * [train your own combination model](#train-your-own-combination-model)
+
 
 
 ----------------------------
@@ -271,7 +273,7 @@ Where the file `combined_per_site_per_read_results` is the output file from the 
 
 Example output of this command:
 
-## train your own model
+## train your own combination model
 
 We provide the script to train a combined model from the per-read and per-site output from any number of methods (from 2 to 5). For instance, the command to train a model with 5 methods would be:
 
