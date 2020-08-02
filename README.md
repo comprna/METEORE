@@ -236,21 +236,30 @@ and Guppy provide a log-likelihood ratio value per site and per read. Similarly,
 
 ```
 python combination_model_prediction.py  -i [path of tsv file containing methods name and path] -m [model_to_use (default or optimized)] -o [output_file]
-
 ```
-Example for the testcase file provided in the package:
-
-cd inside the directory downloaded package directory METEORE then run
+where the file for option `-i` contains contains the information about the method used (1st col) and the path to the respective input file (2nd col). For example, this could be run for the testcase file provided in the package:
 ```
 python combination_model_prediction.py  -i samples.tsv -m optimized -o [output_file]
-
 ```
-**Note**: The order of method name in the samples.tsv file should be same as the order of saved model name. For example the saved model name is *'rf_model_default_**deepsignal_nanopolish**.model'* so the order in the *samples.tsv* file is **deepsignal and then nanopolish** and not the other way round.
+where the file `samples.tsv` has the format
+```
+deepsignal    ./test_case/deepsignal_test.tsv
+nanopolish    ./test_case/nanopolish_test.tsv
+```
+And these .tsv files are of the format indicated above. For instance, the file `deepsignal_test.tsv` has the format
+```
+ID	Pos	Strand	Score
+b9fdd6aa-ba93-4424-8f4b-c632e4d16d2e	1817032	-	2.45
+b6d8fb1d-36e6-4f87-9106-ca74cb66b604	1816321	+	2.63
+a293bb13-f8d3-4ffa-80c5-6cfcc8bab58c	4549464	+	0.32
+930f9738-859a-49fd-bcca-671aaf47417c	1151179	-	-2.96
+...
+```
+and similar for Nanopolish. If you want a different combination, e.g. deepsignal+guppy, you can replace the "nanopolish" line in the `sample.tsv` file with guppy and its input file path. You can also add other methods paths as well in the same file.
 
-This command produces the a directory called `combined_model_results` containing the output file. New results from subsequent runs will be saved into the same output directory.
+**Note**: The order of method names in the samples.tsv file should be same as the order used to generate the combined model. For example, we provide the models with name *'rf_model_default_**deepsignal_nanopolish**.model'* so the order in the *samples.tsv* file should be **deepsignal and then nanopolish** and not the other way round.
 
-
-The ouput after running combination_model_prediction.py script will contain predictions for the reads common to both deepsignal and nanopolish method. The
+This command produces a directory called `combined_model_results` containing the output file. New results from subsequent runs will be saved into the same output directory. The ouput after running combination_model_prediction.py script will contain predictions for the reads common to both deepsignal and nanopolish method. The
 format is as below:
 ```
 ID                                        Pos       Prediction  Prob_methylation
