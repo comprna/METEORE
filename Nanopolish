@@ -1,13 +1,3 @@
-
-"""
-rule single_to_multiFAST5:
-    input:
-        "data/{sample}"
-    output:
-        "multiFast5/{sample}"
-    shell:
-        "single_to_multi_fast5 -i {input} -s {output} -t 10 --recursive"
-"""
 rule index:
     input:
         f5="data/{sample}",
@@ -72,8 +62,8 @@ rule calculate_frequency:
 rule create_input_for_comb_model:
     input:
         log="nanopolish_results/{sample}_nanopolish-log-perCG.tsv",
-        script="script_in_snakemake/nanopolish_input_for_model.R"
+        script="script_in_snakemake/format_nanopolish.R"
     output:
-        "nanopolish_results/{sample}_nanopolish-score.tsv"
+        "nanopolish_results/{sample}_nanopolish-perRead-score.tsv"
     shell:
         "Rscript {input.script} {input.log} {output}"

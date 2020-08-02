@@ -17,10 +17,10 @@ args = commandArgs(trailingOnly=TRUE)
 
 # test if there is at least one argument: if not, return an error
 if (length(args)==0) {
-  stop("Please input your log-likelihood output file from Nanopolish", call.=FALSE)
+  stop("Please input your per-read and per-site log-likelihood output file from Nanopolish", call.=FALSE)
 } else if (length(args)==1) {
   # default output file
-  args[2] = "nanopolish-freq-perCG.txt"
+  args[2] = "nanopolish_freq_perCG.txt"
 }
 
 df <- read.table(args[1], header=TRUE, sep = "\t")

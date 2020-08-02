@@ -19,24 +19,24 @@ rule calculate_frequency:
     input:
         "deepsignal_results/{sample}_deepsignal-prob.tsv"
     output:
-        "deepsignal_results/{sample}_deepsignal-freq-perCG.tsv"
+        "deepsignal_results/{sample}_deepsignal-freq-perCG-raw.tsv"
     shell:
         "python script_in_snakemake/call_modification_frequency.py --input_path {input} --result_file {output} --prob_cf 0"
 
 rule combine_sites:
     input:
-        freq="deepsignal_results/{sample}_deepsignal-freq-perCG.tsv",
+        freq="deepsignal_results/{sample}_deepsignal-freq-perCG-raw.tsv",
         script="script_in_snakemake/run_deepsignal.R"
     output:
-        "deepsignal_results/{sample}_deepsignal-freq-perCG-comb.tsv"
+        "deepsignal_results/{sample}_deepsignal-freq-perCG.tsv"
     shell:
         "Rscript {input.script} {input.freq} {output}"
 
 rule create_input_for_comb_model:
     input:
         prob="deepsignal_results/{sample}_deepsignal-prob.tsv",
-        script="script_in_snakemake/deepsignal_input_for_model.R"
+        script="script_in_snakemake/format_deepsignal.R"
     output:
-        "deepsignal_results/{sample}_deepsignal-score.tsv"
+        "deepsignal_results/{sample}_deepsignal-perRead-score.tsv"
     shell:
         "Rscript {input.script} {input.prob} {output}"

@@ -9,21 +9,19 @@ import pandas as pd
 	extract_tombo_per_read_results.py
 	Author: Zaka Yuen JCSMR, ANU
 	Created on June 2020
-
 	Access the per-read statistics files using the template from here:
 	<https://nanoporetech.github.io/tombo/tombo.html#python-api-examples>
-
 	This script is to:
 	-extract per-read statistics into a text format using Tombo python API
 """
 
-# specify region of interest (plus strand), for example:
+# specify region of interest (plus strand) below:
 reg_data_plus = tombo_helper.intervalData(
-    chrm='NC_000913.3', start=111269, end=2864216, strand="+")
+    chrm='NC_000913.3', start=412305, end=4584088, strand="+")
 
-# specify region of interest (minus strand), for example:
+# specify region of interest (minus strand) below:
 reg_data_minus = tombo_helper.intervalData(
-    chrm='NC_000913.3', start=111269, end=2864216, strand="-")
+    chrm='NC_000913.3', start=412305, end=4584088, strand="-")
 
 # Plus strand
 sample_per_read_stats = tombo_stats.PerReadStats(snakemake.input[0])

@@ -16,7 +16,6 @@ library(plyr)
 args = commandArgs(trailingOnly=TRUE)
 
 df <- read.table(args[1], header = FALSE, sep = "\t") # false header because the header starts with #
-#df <- read.table("~/Analysis/simpson2017/val/vset/m0/guppy_results/m0_guppy-log.tsv", header = FALSE, sep = "\t") # false header because the header starts with #
 colnames(df) <- c("Chr", "Strand","start", "Pos", "read_name", "Log.like.ratio",
                    "log_like_methylated", "log_like_unmethylated", "df.cov", "num_motifs", "sequence")
 df <- select(df, Chr, Pos, Strand, Log.like.ratio)

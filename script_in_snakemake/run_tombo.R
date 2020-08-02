@@ -4,7 +4,7 @@
 # Created on May 2020
 
 # This script is to:
-# -combine methylation scores and coverage outputs from Tombo into one dataframe
+# -combine methylation freq and coverage outputs from Tombo into one dataframe
 # -combine the CpG methylation calls from both strands into a single strand for a CpG site
 
 library(dplyr)

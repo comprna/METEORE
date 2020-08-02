@@ -1,5 +1,3 @@
-
-
 rule detect_modification:
     input:
         fast5="data/{sample}",
@@ -27,7 +25,7 @@ rule wig_to_tsv:
         plus="{sample}.dampened_fraction_modified_reads.plus.wig",
         minus="{sample}.dampened_fraction_modified_reads.minus.wig"
     output:
-        "{sample}_tombo-mods-freqOnly.tsv"
+        "tombo_results/{sample}_tombo-freq-only.tsv"
     script:
         "script_in_snakemake/wig2bed.py"
 
@@ -36,17 +34,17 @@ rule bedgraph_to_tsv:
         plus="{sample}.coverage.plus.bedgraph",
         minus="{sample}.coverage.minus.bedgraph"
     output:
-        "{sample}_tombo-covOnly.tsv"
+        "tombo_results/{sample}_tombo-cov-only.tsv"
     script:
         "script_in_snakemake/bedgraph2bed.py"
 
 rule combine_freq_and_cov:
     input:
         script="script_in_snakemake/run_tombo.R",
-        freq="{sample}_tombo-mods-freqOnly.tsv",
-        cov="{sample}_tombo-covOnly.tsv"
+        freq="tombo_results/{sample}_tombo-freq-only.tsv",
+        cov="tombo_results/{sample}_tombo-cov-only.tsv"
     output:
-        "{sample}_tombo-mods-freqNcov-perCG.tsv"
+        "tombo_results/{sample}_tombo-freq-perCG.tsv"
     shell:
         "Rscript {input.script} {input.freq} {input.cov} {output}"
 
@@ -54,6 +52,6 @@ rule extract_per_read_results:
     input:
         "{sample}.CpG.tombo.per_read_stats"
     output:
-        "{sample}_tombo_mods-scores-perRead.tsv"
+        "tombo_results/{sample}_tombo-perRead-score.tsv"
     script:
         "script_in_snakemake/extract_tombo_per_read_results.py"

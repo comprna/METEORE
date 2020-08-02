@@ -24,7 +24,7 @@ rule extract_methylation_from_rocks:
         bai="guppy_results/mapped/{sample}.bam.bai",
         fa="data/ecoli_k12_mg1655.fasta"
     output:
-        "guppy_results/{sample}_guppy-log.tsv"
+        "guppy_results/{sample}_guppy-log-perCG.tsv"
     shell:
         """
         set +e
@@ -40,9 +40,18 @@ rule extract_methylation_from_rocks:
 
 rule calculate_frequency:
     input:
-        script="script/run_guppy.R",
-        log="guppy_results/{sample}_guppy-log.tsv"
+        script="script_in_snakemake/run_guppy.R",
+        log="guppy_results/{sample}_guppy-log-perCG.tsv"
     output:
         "guppy_results/{sample}_guppy-freq-perCG.tsv"
+    shell:
+        "Rscript {input.script} {input.log} {output}"
+
+rule create_input_for_comb_model:
+    input:
+        log="guppy_results/{sample}_guppy-log-perCG.tsv",
+        script="script_in_snakemake/format_guppy.R"
+    output:
+        "guppy_results/{sample}_guppy-perRead-score.tsv"
     shell:
         "Rscript {input.script} {input.log} {output}"
