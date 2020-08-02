@@ -4,7 +4,7 @@
 **About METEORE**
 
 METEORE provides snakemake pipelines for various tools to detect DNA methylation from Nanopore sequencing reads. Additionally, it provides 
-a new predictive model that combines the outputs from two of the tools to produce a consensus prediction with higher accuracy than the individual tools.
+a new predictive model that combines the outputs from the tools to produce a consensus prediction with higher accuracy than the individual tools.
 
 ----------------------------
 # Table of Contents
