@@ -12,23 +12,27 @@ from sklearn.ensemble import RandomForestClassifier
 from itertools import combinations 
 import sklearn
 from functools import reduce
+import os
 import argparse
+import warnings
+warnings.filterwarnings("ignore")
+
 
 parser = argparse.ArgumentParser(description = 'train and save the combined models')
 
-parser.add_argument('--deepsignalfilepath','-d', type = str, required = True,
+parser.add_argument('--deepsignalfilepath','-d', type = str, required = False,
     help = 'Path to deepsignal output tsv file in the format [ID, Pos,Strand,Score]. Can be compressed in gz.')  
 
-parser.add_argument('--nanopolishfilepath','-n', type = str, required = True,
+parser.add_argument('--nanopolishfilepath','-n', type = str, required = False,
     help = 'Path to nanopolish output tsv file in the format [ID, Pos, Strand,Score]. Can be compressed in gz.')  
 
-parser.add_argument('--guppyfilepath','-g', type = str, required = True,
+parser.add_argument('--guppyfilepath','-g', type = str, required = False,
     help = 'Path to guppy output tsv file in the format [ID, Pos,Strand,Score]. Can be compressed in gz.')  
 
-parser.add_argument('--megalodonfilepath','-m', type = str, required = True,
+parser.add_argument('--megalodonfilepath','-m', type = str, required = False,
     help = 'Path to megalodon output tsv file in the format [ID, Pos, Strand,Score]. Can be compressed in gz.')  
 
-parser.add_argument('--tombofilepath','-t', type = str, required = True,
+parser.add_argument('--tombofilepath','-t', type = str, required = False,
     help = 'Path to tombo output tsv file in the format [ID, Pos,Strand,Score]. Can be compressed in gz.')  
 
 parser.add_argument('--combinations','-c', choices=range(2, 6),required=True, type=int,
@@ -64,19 +68,26 @@ def combine_methods(val):
     
  
     
-if __name__ == '__main__':    
+if __name__ == '__main__':   
     
-    deepsignal= mod_file(options.deepsignalfilepath)
-    nanopolish= mod_file(options.nanopolishfilepath)
-    guppy= mod_file(options.guppyfilepath)
-    megalodon= mod_file(options.megalodonfilepath)
-    tombo= mod_file(options.tombofilepath)
-    
-    methods={"deepsignal":deepsignal, "guppy":guppy, "megalodon":megalodon, "nanopolish":nanopolish,"tombo":tombo}
-    
-    
-    comb = combinations(["deepsignal", "guppy", "megalodon","nanopolish","tombo"], options.combinations) 
-
+    if options.deepsignalfilepath is not None:
+        deepsignal= mod_file(options.deepsignalfilepath)
+        methods={"deepsignal":deepsignal}
+    if options.nanopolishfilepath is not None:
+        nanopolish= mod_file(options.nanopolishfilepath)
+        methods.update({"nanopolish":nanopolish})
+    if options.guppyfilepath is not None:
+        guppy= mod_file(options.guppyfilepath)
+        methods.update({"guppy":guppy})
+    if options.megalodonfilepath is not None: 
+        megalodon= mod_file(options.megalodonfilepath)
+        methods.update({"megalodon":megalodon})
+    if options.tombofilepath is not None:
+        tombo= mod_file(options.tombofilepath)
+        methods.update({"tombo":tombo})
+  
+    comb = combinations(list(methods.keys()), options.combinations) 
+    os.makedirs(options.output) 
 
 
     for val in list(comb):
@@ -92,12 +103,12 @@ if __name__ == '__main__':
         
         rf.fit(X, y)
         
-        filename = options.output+'rf_model_max_depth_3_n_estimator_10_'+'_'.join(val)+'.model'
+        filename = options.output+'/'+'rf_model_max_depth_3_n_estimator_10_'+'_'.join(val)+'.model'
         joblib.dump(rf, open(filename, 'wb'))
         
-    comb = combinations(["deepsignal", "guppy", "megalodon","nanopolish","tombo"], options.combinations) 
+  
     
-    
+    comb = combinations(list(methods.keys()), options.combinations) 
     
     for val in list(comb):
         X,y=combine_methods(val)
@@ -111,5 +122,5 @@ if __name__ == '__main__':
         rf = RandomForestClassifier()
         rf.fit(X, y)
        
-        filename = options.output+'rf_model_default_'+'_'.join(val)+'.model'
+        filename = options.output+'/'+'rf_model_default_'+'_'.join(val)+'.model'
         joblib.dump(rf, open(filename, 'wb'),compress=3)
