@@ -1,0 +1,48 @@
+rule minimap2:
+    input:
+        fa="data/ecoli_k12_mg1655.fasta",
+        fq="guppy_results/{sample}.fq"
+    output:
+        "guppy_results/mapped/{sample}.bam"
+    shell:
+        "minimap2 -a -x map-ont {input.fa} {input.fq} | samtools sort -T tmp -o {output}"
+
+rule samtools_index_and_extract_methylation_from_fast5:
+    input:
+        bam="guppy_results/mapped/{sample}.bam",
+        script="guppy_results/gcf52ref/scripts/extract_methylation_fast5.py"
+    output:
+        "guppy_results/mapped/{sample}.bam.bai"
+    shell:
+        "samtools index {input.bam} && python {input.script} -p 10 guppy_results/workspace/*.fast5"
+
+rule extract_methylation_from_rocks:
+    input:
+        #rocks="base_mods.rocksdb",
+        script="guppy_results/gcf52ref/scripts/extract_methylation_from_rocks.py",
+        bam="guppy_results/mapped/{sample}.bam",
+        bai="guppy_results/mapped/{sample}.bam.bai",
+        fa="data/ecoli_k12_mg1655.fasta"
+    output:
+        "guppy_results/{sample}_guppy-log.tsv"
+    shell:
+        """
+        set +e
+        python {input.script} -d base_mods.rocksdb/ -a {input.bam} -r {input.fa} -o {output}
+        exitcode=$?
+        if [ $exitcode -eq 1 ]
+        then
+            exit 0
+        else
+            exit 0
+        fi
+        """
+
+rule calculate_frequency:
+    input:
+        script="script/run_guppy.R",
+        log="guppy_results/{sample}_guppy-log.tsv"
+    output:
+        "guppy_results/{sample}_guppy-freq-perCG.tsv"
+    shell:
+        "Rscript {input.script} {input.log} {output}"

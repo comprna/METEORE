@@ -46,13 +46,19 @@ def main(mp,combine_file):
     X=sklearn.preprocessing.MinMaxScaler().fit_transform(X)
     prediction=pd.DataFrame(loaded_model.predict(X))
     prediction_prob=pd.DataFrame(loaded_model.predict_proba(X))
-    prediction.rename(columns={0:"prediction"}, inplace=True)
+    prediction.rename(columns={0:"Prediction"}, inplace=True)
     prediction_prob=prediction_prob[[1]]
-    prediction_prob.rename(columns={1:"prob_methylation"}, inplace=True)
+    prediction_prob.rename(columns={1:"Prob_methylation"}, inplace=True)
     final_output=pd.concat([combine_file[combine_file.columns[:2]],prediction,prediction_prob], axis=1)
     os.makedirs(options.output) 
-    final_output.to_csv(options.output+'/predictions_combination_method.tsv', header=True, index=None, sep='\t')
-   
+    #final_output.to_csv(options.output+'/predictions_combination_method.tsv', header=True, index=None, sep='\t')
+    dir = ("combined_model_results")
+    if not os.path.isdir(dir):
+        os.makedirs(dir)
+        final_output.to_csv(dir+'/'+options.output, header=True, index=None, sep='\t')
+    else:
+        final_output.to_csv(dir+'/'+options.output, header=True, index=None, sep='\t')
+
 if __name__ == '__main__':
      
      df_file=pd.read_csv(options.methodsfile,header=None, sep='\t')

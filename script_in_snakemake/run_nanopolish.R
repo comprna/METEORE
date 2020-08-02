@@ -9,19 +9,18 @@
 # 	-log-likelihood ratio >=2.5, considered as methylated 
 # 	-log-likelihood ratio <=-2.5, considered as unmethylated
 
+library(data.table)
 library(dplyr)
 library(plyr)
-library(data.table)
-library(reshape2)
 
 args = commandArgs(trailingOnly=TRUE)
 
 # test if there is at least one argument: if not, return an error
 if (length(args)==0) {
-  stop("At least one argument must be supplied (input file).n", call.=FALSE)
+  stop("Please input your log-likelihood output file from Nanopolish", call.=FALSE)
 } else if (length(args)==1) {
   # default output file
-  args[2] = "out.txt"
+  args[2] = "nanopolish-freq-perCG.txt"
 }
 
 df <- read.table(args[1], header=TRUE, sep = "\t")
@@ -50,8 +49,7 @@ df$df.freq <- df$Num.methylated/df$df.cov
 df <- select(df, Chr, Pos, Strand, df.cov, df.freq)
 
 # Accumulate CpG sites into +'ve strand
-df[df$Strand == "-","Pos"] <-
-  df[df$Strand == "-","Pos"]-1
+df[df$Strand == "-","Pos"] <- df[df$Strand == "-","Pos"]-1
 
 # Use data.table to compute the mean of duplicated position while keeping non-duplicated sites
 df <- data.table(df)
