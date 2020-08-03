@@ -21,19 +21,19 @@ warnings.filterwarnings("ignore")
 parser = argparse.ArgumentParser(description = 'train and save the combined models')
 
 parser.add_argument('--deepsignalfilepath','-d', type = str, required = False,
-    help = 'Path to deepsignal output tsv file in the format [ID, Pos,Strand,Score]. Can be compressed in gz.')  
+    help = 'Path to deepsignal output tsv file in the format [ID, Pos,Strand,Label,Score]. Can be compressed in gz.')  
 
 parser.add_argument('--nanopolishfilepath','-n', type = str, required = False,
-    help = 'Path to nanopolish output tsv file in the format [ID, Pos, Strand,Score]. Can be compressed in gz.')  
+    help = 'Path to nanopolish output tsv file in the format [ID, Pos, Strand,Label,Score]. Can be compressed in gz.')  
 
 parser.add_argument('--guppyfilepath','-g', type = str, required = False,
-    help = 'Path to guppy output tsv file in the format [ID, Pos,Strand,Score]. Can be compressed in gz.')  
+    help = 'Path to guppy output tsv file in the format [ID, Pos,Strand,Label,Score]. Can be compressed in gz.')  
 
 parser.add_argument('--megalodonfilepath','-m', type = str, required = False,
-    help = 'Path to megalodon output tsv file in the format [ID, Pos, Strand,Score]. Can be compressed in gz.')  
+    help = 'Path to megalodon output tsv file in the format [ID, Pos, Strand,Label,Score]. Can be compressed in gz.')  
 
 parser.add_argument('--tombofilepath','-t', type = str, required = False,
-    help = 'Path to tombo output tsv file in the format [ID, Pos,Strand,Score]. Can be compressed in gz.')  
+    help = 'Path to tombo output tsv file in the format [ID, Pos,Strand,Label,Score]. Can be compressed in gz.')  
 
 parser.add_argument('--combinations','-c', choices=range(2, 6),required=True, type=int,
    help = 'number of methods to combine together for training')
@@ -46,7 +46,7 @@ options = parser.parse_args()
 def mod_file(data_file_path):
     data_file=pd.read_csv(data_file_path, header=0, sep="\t")
     name=data_file_path.split("\\")[-1].split(".")[0]
-    data_file.drop(["Set","Prediction"], axis=1, inplace=True)
+    #data_file.drop(["Set","Prediction"], axis=1, inplace=True)
     data_file.drop_duplicates(subset=["ID","Pos", "Strand"],inplace=True)
     data_file.reset_index(inplace=True,drop=True)
     mask=data_file.index[data_file.Strand=="-"].tolist()
