@@ -50,7 +50,7 @@ def main(mp,combine_file):
     prediction_prob=prediction_prob[[1]]
     prediction_prob.rename(columns={1:"Prob_methylation"}, inplace=True)
     final_output=pd.concat([combine_file[combine_file.columns[:2]],prediction,prediction_prob], axis=1)
-    os.makedirs(options.output) 
+    #os.makedirs(options.output) 
     #final_output.to_csv(options.output+'/predictions_combination_method.tsv', header=True, index=None, sep='\t')
     dir = ("combined_model_results")
     if not os.path.isdir(dir):
