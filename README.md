@@ -410,7 +410,6 @@ python prediction_to_mod_frequency.py combined_per_site_per_read_results combine
 ```
 Where the file `combined_per_site_per_read_results` is the output file from the previous step, and `combined_per_site_results` is the new output with the percentage methylation per genomic position.
 
-Example output of this command:
 
 ## train your own combination model
 
