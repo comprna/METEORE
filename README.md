@@ -423,5 +423,22 @@ For example, the command to train a model with DeepSignal, Nanopolish, and guppy
 ```
 python combination_model_train.py  -d deepsignal.tsv -n nanopolish.tsv -g guppy.tsv -c 3 -o output_models
 ```
-This command will create an output directory called `output_models`, and the models named `rf_model_default_deepsignal_nanopolish_guppy.model` and `rf_model_max_depth_3_n_estimator_10_deepsignal_nanopolish_guppy.model` will be saved inside this directory.
-
+This command will create an output directory called `output_models`, and the models named `rf_model_default_deepsignal_nanopolish_guppy.model` and `rf_model_max_depth_3_n_estimator_10_deepsignal_nanopolish_guppy.model` will be saved inside this directory. To run this new model, you will need to create a new file
+`new_model_content` of the form, e.g.:
+```
+deepsignal    deepsignal_test2.tsv
+nanopolish    nanopolish_test2.tsv
+guppy         guppy_test2.tsv
+```
+where the `_test2.tsv` files contain the reads and scores that you want to use for consensus prediction in the format
+```
+ID	Pos	Strand	Score
+b9fdd6aa-ba93-4424-8f4b-c632e4d16d2e	1817032	-	2.45
+...
+```
+The command to obtain the consensus predictions could be of the form
+```
+python combination_model_prediction.py  -i new_model_content.tsv -m optimized -o output2
+```
+This command will use the model `rf_model_max_depth_3_n_estimator_10_deepsignal_nanopolish_guppy.model` to predict on the sites and reads common in the input files 
+`deepsignal_test2.tsv`, `nanopolish_test2.tsv`, and `guppy_test2.tsv`. 
