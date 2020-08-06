@@ -13,30 +13,30 @@ rule output_browser_files:
         fast5="data/{sample}",
         stats="{sample}.CpG.tombo.stats"
     output:
-        "{sample}.coverage.minus.bedgraph",
-        "{sample}.coverage.plus.bedgraph",
-        "{sample}.dampened_fraction_modified_reads.minus.wig",
-        "{sample}.dampened_fraction_modified_reads.plus.wig"
+        "{sample}.valid_coverage.minus.wig",
+        "{sample}.valid_coverage.plus.wig",
+        "{sample}.fraction_modified_reads.minus.wig",
+        "{sample}.fraction_modified_reads.plus.wig"
     shell:
-        "tombo text_output browser_files --fast5-basedirs {input.fast5} --statistics-filename {input.stats} --file-types coverage dampened_fraction --browser-file-basename {wildcards.sample}"
+        "tombo text_output browser_files --fast5-basedirs {input.fast5} --statistics-filename {input.stats} --file-types valid_coverage fraction --browser-file-basename {wildcards.sample}"
 
-rule wig_to_tsv:
+rule wig_to_tsv_for_mod:
     input:
-        plus="{sample}.dampened_fraction_modified_reads.plus.wig",
-        minus="{sample}.dampened_fraction_modified_reads.minus.wig"
+        plus="{sample}.fraction_modified_reads.plus.wig",
+        minus="{sample}.fraction_modified_reads.minus.wig"
     output:
         "tombo_results/{sample}_tombo-freq-only.tsv"
     script:
         "script_in_snakemake/wig2bed.py"
 
-rule bedgraph_to_tsv:
+rule wig_to_tsv_for_cov:
     input:
-        plus="{sample}.coverage.plus.bedgraph",
-        minus="{sample}.coverage.minus.bedgraph"
+        plus="{sample}.valid_coverage.plus.wig",
+        minus="{sample}.valid_coverage.minus.wig"
     output:
         "tombo_results/{sample}_tombo-cov-only.tsv"
     script:
-        "script_in_snakemake/bedgraph2bed.py"
+        "script_in_snakemake/wig2bed.py"
 
 rule combine_freq_and_cov:
     input:
