@@ -397,7 +397,7 @@ Given the already pre-trained model (models available in `./saved_models/`), to 
 python combination_model_prediction.py  -i [path of tsv file containing methods name and path] -m [model_to_use (default or optimized)] -o [output_file]
 ```
 where the file for option `-i` contains the information about the methods used (1st col) and the path to the respective input file (2nd col).
-For example, if we call this file `model_content.tsv`:
+For example, if we call this file `model_content.tsv` (provided as an example with the package):
 ```
 python combination_model_prediction.py  -i model_content.tsv -m default -o output
 ```
@@ -427,7 +427,7 @@ python combination_model_prediction.py  -i model_content.tsv -m optimized -o out
 The model used will be `rf_model_max_depth_3_n_estimator_10_deepsignal_nanopolish.model`. If you want a different combination, e.g. deepsignal+guppy,
 you can replace the "nanopolish" line in the `model_content.tsv` file with guppy and its input file path. You can also add other methods paths as well in the same file.
 
-**Note**: The order of method names in the samples.tsv file should be same as the order used to generate the combined model. For example, we provide the models with name *'rf_model_default_**deepsignal_nanopolish**.model'* so the order in the *samples.tsv* file should be **deepsignal and then nanopolish** and not the other way round.
+**Note**: The order of method names in the model_content.tsv file should be same as the order used to generate the combined model. For example, we provide the models with name *'rf_model_default_**deepsignal_nanopolish**.model'* so the order in the *model_content.tsv* file should be **deepsignal and then nanopolish** and not the other way round.
 
 These commands will write the output in a directory called `combined_model_results`. New results from subsequent runs will be saved into
 the same output directory. The ouput after running combination_model_prediction.py script will contain predictions for the
