@@ -36,7 +36,7 @@ a new predictive model that combines the outputs from the tools to produce a con
       * [Input file](#input-file)
       * [Command](#command)
       * [Per site predictions](#per-site-predictions)
-      * [train your own combination model](#train-your-own-combination-model)
+      * [Train your own combination model](#train-your-own-combination-model)
 
 
 
@@ -337,7 +337,7 @@ We provide a bash script to generate the methylation frequency file and the inpu
 ./script/megalodon.sh example
 ```
 You will get the following files:
-* `example_megaldon-freq-perCG.tsv` contains the per-site data including the genomic position of the CpG site, methylation frequency and coverage. The methylation calls from both strands are merged into a single strand.
+* `example_megalodon-freq-perCG.tsv` contains the per-site data including the genomic position of the CpG site, methylation frequency and coverage. The methylation calls from both strands are merged into a single strand.
 * `example_megalodon-perRead-score.tsv` is a per-read prediction file containing four columns: `ID`,	`Pos`,	`Strand` and `Score`. This file can be used later in METEORE to generate a consensus prediction.
 
 
@@ -377,7 +377,9 @@ pip install -r requirements.txt
 
 
 ## Input file
-To make the predictions from combination model (e.g. deepsignal and nanopolish) the input (.tsv) file from each method must be formatted as below:
+To make the predictions using the combination model (eg. ***deepSignal*** and ***nanopolish***), you can generate the per-read prediction input
+file `example_deepsignal-perRead-score.tsv` and `example_nanopolish-perRead-score.tsv` as described before in our snakemake pipelines.
+The input (.tsv) file from each method must be formatted as below:
 ```
 ID                                      Pos       Strand    Score
 2f43696e-70f0-42dd-b23e-d9e0ea954d4f    2687804   -         29.64
@@ -385,68 +387,62 @@ ID                                      Pos       Strand    Score
 dc9dcb55-703c-4251-a916-4214abd67991    1173719   +         5.34
 2bea7f2a-f76c-491a-b5ee-b22c6f4a8539    1864274   -         5.33
 ```
-where the score is the significance score given by each method. In our snakemake pipelines, this score is generated as described above.
+where the score is the significance score given by each method.
 Nanopolish and Guppy provide a log-likelihood ratio value per site and per read. Similarly, Tombo produces a significance value per site and per read.
 On the other hand, for DeepSignal we give the log-ratio of the probabilities for a site to be methylated over the probablity of being unmethylated for each read.
 Similarly, for Megalodon we used the difference of the log-probabilities to obtain a log-ratio.
 
 ## Command
-
 Given the already pre-trained model (models available in `./saved_models/`), to run the model you need the following command:
 ```
-python combination_model_prediction.py  -i [path of tsv file containing methods name and path] -m [model_to_use (default or optimized)] -o [output_file]
+python combination_model_prediction.py  -i [path of tsv file containing the methods' names and the paths to the input file] -m [model_to_use (default or optimized)] -o [output_file]
 ```
-where the file for option `-i` contains the information about the methods used (1st col) and the path to the respective input file (2nd col).
-For example, if we call this file `model_content.tsv` (provided as an example with the package):
+**Inputs (-i)**
+The file for option `-i` contains the methods you choose to use (1st column) and the path to the respective per-read score files (2nd column):
 ```
-python combination_model_prediction.py  -i model_content.tsv -m default -o output
+deepsignal	./example_results/deepsignal_results/example_deepsignal-perRead-score.tsv
+nanopolish	./example_results/nanopolish_results/example_nanopolish-perRead-score.tsv
 ```
-the file `model_content.tsv` could have the format
+Here we call this file `model_content.tsv` (provided as an example with the package) and use the results `example_results/` produced by the method from the example dataset.
+
+**Models (-m)**
+You can choose to use either `-m default` or `-m optimised`:
+```bash
+# Use the default model
+python combination_model_prediction.py -i model_content.tsv -m default -o example_deepsignal_nanopolish-default-model-perRead.tsv
+# Use the optimized model
+python combination_model_prediction.py -i model_content.tsv -m optimized -o example_deepsignal_nanopolish-optimized-model-perRead.tsv
 ```
-deepsignal    ./test_case/deepsignal_test.tsv
-nanopolish    ./test_case/nanopolish_test.tsv
+* `default` refers to the parameters used to build the Random Forest, which in this case are the default parameters from the [sklern library](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html) (n_estimator = 100 and max_dep = None). The above command will use the model named `rf_model_default_deepsignal_nanopolish.model` to score the sites and reads that are common
+between the two files `example_deepsignal-perRead-score.tsv` and `example_nanopolish-perRead-score.tsv`.
+
+* `optimised` refers to the adjusted parameters for n_estimator and max_dep used to build the Random Forest from sklern (n_estimator = 3 and max_dep = 10). The model used in the above command will be `rf_model_max_depth_3_n_estimator_10_deepsignal_nanopolish.model`.
+
+**Important note:**
+1. If you want a different combination, e.g. deepsignal+guppy, you can replace the "nanopolish" line in the `model_content.tsv` file with guppy and its input file path. You can also add other methods paths as well in the same file.
+2. The order of method's names in the model_content.tsv file should be same as the order used to generate the combined model. For example, we provide the models with name *'rf_model_default_**deepsignal_nanopolish**.model'* so the order in the *model_content.tsv* file should be **deepsignal and then nanopolish** and not the other way round.
+
+**Output (-o)**
+Use **-o** option to write the per-read consensus prediction output to the specified file.
+All outputs are written into the directory called `combined_model_results`. New results from subsequent runs will be saved into
+the same output directory.
+
+The output will contain per-read predictions for the reads common to both deepsignal and nanopolish method. For example, in the `example_deepsignal-nanopolish-optimized-model-perRead.tsv`
 ```
-And these .tsv files are of the format indicated above. For instance, the file `deepsignal_test.tsv` has the format
-```
-ID                                    Pos       Strand   Score
-b9fdd6aa-ba93-4424-8f4b-c632e4d16d2e	1817032   -        2.45
-b6d8fb1d-36e6-4f87-9106-ca74cb66b604	1816321   +        2.63
-a293bb13-f8d3-4ffa-80c5-6cfcc8bab58c	4549464   +        0.32
-930f9738-859a-49fd-bcca-671aaf47417c	1151179   -        -2.96
+ID	                                   Pos	      Prediction	  Prob_methylation
+c3e4c0c6-11f9-4ecb-858e-877e81e31a0c	 3502752	  0	            0.1621034590408923
+c3e4c0c6-11f9-4ecb-858e-877e81e31a0c	 3502750	  0	            0.041931319736462455
+c3e4c0c6-11f9-4ecb-858e-877e81e31a0c	 3502735	  0	            0.49939245262344834
+c3e4c0c6-11f9-4ecb-858e-877e81e31a0c	 3502715	  0	            0.041931319736462455
 ...
 ```
-and similar for Nanopolish. This command will use the model named `rf_model_default_deepsignal_nanopolish.model` to score the sites and reads that are common
-between the two files `./test_case/deepsignal_test.tsv` and `./test_case/nanopolish_test.tsv`.
-Default refers to the parameters used to build the Random Forest, which in this case are the defult parameters from the
-[sklern library](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html) (n_estimator = 100 and max_dep = None).
-
-If we use the command
-```
-python combination_model_prediction.py  -i model_content.tsv -m optimized -o output
-```
-The model used will be `rf_model_max_depth_3_n_estimator_10_deepsignal_nanopolish.model`. If you want a different combination, e.g. deepsignal+guppy,
-you can replace the "nanopolish" line in the `model_content.tsv` file with guppy and its input file path. You can also add other methods paths as well in the same file.
-
-**Note**: The order of method names in the model_content.tsv file should be same as the order used to generate the combined model. For example, we provide the models with name *'rf_model_default_**deepsignal_nanopolish**.model'* so the order in the *model_content.tsv* file should be **deepsignal and then nanopolish** and not the other way round.
-
-These commands will write the output in a directory called `combined_model_results`. New results from subsequent runs will be saved into
-the same output directory. The ouput after running combination_model_prediction.py script will contain predictions for the
-reads common to both deepsignal and nanopolish method. The
-format is as below:
-```
-ID                                        Pos       Prediction  Prob_methylation
-2f43696e-70f0-42dd-b23e-d9e0ea954d4f    2687804           0      0.02
-dc9dcb55-703c-4251-a916-4214abd67991    1173719           1      0.90
-2bea7f2a-f76c-491a-b5ee-b22c6f4a8539    1864274           0      0.45
-...
-```
-The column prediction (0 refers to unmethylated and 1 refers to methylated) is based on a threshold of 0.5 score. That is, if the P(methylation) is <= 0.5,
+The column `prediction` (0 refers to unmethylated and 1 refers to methylated) is based on a threshold of 0.5 score. That is, if the P(methylation) is <= 0.5,
 it is predicted as unmethylated (0), otherwise as methylated (1). Predictions for a different thresholds can be obtained by parsing the column `Prob_methylation`.
 
 
 ## Per-site predictions
 
-We also provide a Python script to convert the per-site predictions for each individual read (methylated / unmethylated) into per-site predictions at genome level (methylation frequency) by summarising the predictions on individual reads from the model.
+We also provide a Python script to convert the per-site predictions for each individual read (methylated / unmethylated) into per-site predictions at genome level (methylation frequency) by summarizing the predictions on individual reads from the model.
 ```
 prediction_to_mod_frequency.py [-h] -i INPUT [-t THRESHOLD] -o OUTPUT
 ```
@@ -455,11 +451,23 @@ where the input is the file produced from the previous step, and the output is t
 Run `python prediction_to_mod_frequency.py -h` for help.
 
 For example:
+```bash
+# You can specify a threshold when -t option is used
+python prediction_to_mod_frequency.py -i combined_model_results/example_deepsignal_nanopolish_optimized_model_perRead.tsv -t 0.46 -o combined_model_results/example_deepsignal-nanopolish-optimized-model-freq-perCG.tsv
+# Or you can use the default threshold of 0.5
+python prediction_to_mod_frequency.py -i combined_model_results/example_deepsignal_nanopolish_default_model_perRead.tsv -o combined_model_results/example_deepsignal-nanopolish-default-model-freq-perCG.tsv
 ```
-python prediction_to_mod_frequency.py combined_model_results/example_combined-model.tsv -t 0.456 -o combined_model_results/example_combined-model-freq-perCG.tsv
+The per-site prediction output contains the following fields:
+```
+Pos	        Unmodified_read	  Modified_read	  Coverage      Methylation_frequency
+3507262     3                 12              15            0.8
+3507265     3                 12              15            0.8
+3507269     2                 13              15            0.8666666666666667
+3507274     4                 11              15            0.7333333333333333
+
 ```
 
-## train your own combination model
+## Train your own combination model
 
 We provide the script to train a combined model from the per-read and per-site output from any number of methods (from 2 to 5). For instance, the command to train a model with 5 methods would be:
 ```

@@ -1,2 +1,2 @@
-deepsignal	./test_case/deepsignal_test.tsv
-nanopolish	./test_case/nanopolish_test.tsv
+deepsignal	./example_results/deepsignal_results/example_deepsignal-perRead-score.tsv
+nanopolish	./example_results/nanopolish_results/example_nanopolish-perRead-score.tsv
