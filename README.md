@@ -58,9 +58,15 @@ bash Miniconda3-latest-Linux-x86_64.sh
 ```
 Accept the license terms during installation.
 
-Once you have installed Conda, you can download the Snakemake pipelines and example datasets.
+Install `Mamba` via conda to install Snakemake for each pipeline later. See [Snakemake documentation](https://snakemake.readthedocs.io/en/stable/getting_started/installation.html) for more details.
+```
+conda install -c conda-forge mamba
+```
+
+Once you have installed Conda and Mamba, you can download the Snakemake pipelines and example datasets.
 ```
 git clone https://github.com/comprna/METEORE.git
+cd METEORE/
 ```
 ------------------------------------------
 # Tutorial on an example dataset
@@ -77,14 +83,13 @@ We provide an example dataset `data/example` along with a genome reference `data
 
 ### Create and activate the Conda environment
 
-The first step is to create the environment from the nanopolish.yml file:
-```
-conda env create -f nanopolish.yml
-```
-
-Then activate the Conda environment:
-```
-conda activate nanopolish_cpg_snakemake
+```bash
+# Create an environment with Snakemake installed
+mamba create -c conda-forge -c bioconda -n meteore_nanopolish_env snakemake
+# Activate
+conda activate meteore_nanopolish_env
+# Install all required packages using conda
+conda install -c bioconda nanopolish samtools r-data.table r-dplyr r-plyr
 ```
 
 ### Run the snakemake
@@ -93,7 +98,7 @@ Before executing the workflow below, make sure you have the basecalled fastq fil
 
 A Snakefile named `Nanopolish` contains all rules for the Snakemake workflow. Run the snakemake to create the output files:
 ```
-snakemake -s Nanopolish nanopolish_results/example_nanopolish-freq-perCG.tsv
+snakemake -s Nanopolish nanopolish_results/example_nanopolish-freq-perCG.tsv --cores 1
 ```
 This will produce four index files `example.fastq.index`, `example.fastq.index.fai`, `example.fastq.index.gzi` and `example.fastq.index.readdb`, and the `nanopolish_results` output directory containing all output files.
 * `example_nanopolish-log.tsv` is the raw output after running `nanopolish call-methylation`.
@@ -118,7 +123,7 @@ NC_000913.3     3504429   0.875           8
 
 You can also generate the per-read prediction output in a format that can be used in METEORE to generate a consensus prediction (see further below).
 ```
-snakemake -s Nanopolish nanopolish_results/example_nanopolish-perRead-score.tsv
+snakemake -s Nanopolish nanopolish_results/example_nanopolish-perRead-score.tsv --cores 1
 ```
 The output is in .tsv format and contains four columns: `ID`,	`Pos`,	`Strand` and `Score`, e.g.:
 ```

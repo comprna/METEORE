@@ -10,27 +10,40 @@ rule index:
     shell:
         "nanopolish index -d {input.f5} {input.fq}"
 
-rule minimap2:
+rule minimap2: # snakemake wrappers for minimap2
     input:
-        fa="data/ecoli_k12_mg1655.fasta",
-        fq="{sample}.fastq"
+        target="data/ecoli_k12_mg1655.fasta", # can be either genome index or genome fasta
+        query=["{sample}.fastq"]
     output:
         "nanopolish_results/mapped/{sample}.bam"
+    log:
+        "nanopolish_results/mapped/{sample}.log"
+    params:
+        extra="-a -x map-ont"
+    threads: 6
+    wrapper:
+        "0.66.0/bio/minimap2/aligner"
+
+rule samtools_sort:
+    input:
+        "nanopolish_results/mapped/{sample}.bam"
+    output:
+        "nanopolish_results/mapped/{sample}.sorted.bam"
     shell:
-        "minimap2 -a -x map-ont {input.fa} {input.fq} | samtools sort -T tmp -o {output}"
+        "samtools sort -o {output} {input}"
 
 rule samtools_index:
     input:
-        "nanopolish_results/mapped/{sample}.bam"
+        "nanopolish_results/mapped/{sample}.sorted.bam"
     output:
-        "nanopolish_results/mapped/{sample}.bam.bai"
+        "nanopolish_results/mapped/{sample}.sorted.bam.bai"
     shell:
         "samtools index {input}"
 
 rule call_methylation:
     input:
-        bam="nanopolish_results/mapped/{sample}.bam",
-        bai="nanopolish_results/mapped/{sample}.bam.bai",
+        bam="nanopolish_results/mapped/{sample}.sorted.bam",
+        bai="nanopolish_results/mapped/{sample}.sorted.bam.bai",
         fa="data/ecoli_k12_mg1655.fasta",
         fq="{sample}.fastq",
         index="{sample}.fastq.index",
