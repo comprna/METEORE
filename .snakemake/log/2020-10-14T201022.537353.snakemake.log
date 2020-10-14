@@ -1,0 +1,21 @@
+Building DAG of jobs...
+Using shell: /bin/bash
+Provided cores: 12
+Rules claiming more threads will be scaled down.
+Conda environments: ignored
+Job counts:
+	count	jobs
+	1	calculate_frequency
+	1
+
+[Wed Oct 14 20:10:22 2020]
+rule calculate_frequency:
+    input: script_in_snakemake/run_nanopolish.R, nanopolish_results/example_nanopolish-log-perCG.tsv
+    output: nanopolish_results/example_nanopolish-freq-perCG.tsv
+    jobid: 0
+    wildcards: sample=example
+
+[Wed Oct 14 20:10:23 2020]
+Finished job 0.
+1 of 1 steps (100%) done
+Complete log: /home/admin/comprna/METEORE/.snakemake/log/2020-10-14T201022.537353.snakemake.log

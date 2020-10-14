@@ -1,0 +1,94 @@
+Building DAG of jobs...
+Using shell: /bin/bash
+Provided cores: 12
+Rules claiming more threads will be scaled down.
+Conda environments: ignored
+Job counts:
+	count	jobs
+	1	call_methylation
+	1	create_input_for_comb_model
+	1	index
+	1	minimap2
+	1	samtools_index
+	1	samtools_sort
+	1	split_cpgs
+	7
+
+[Wed Oct 14 20:09:41 2020]
+rule minimap2:
+    input: data/ecoli_k12_mg1655.fasta, example.fastq
+    output: nanopolish_results/mapped/example.bam
+    log: nanopolish_results/mapped/example.log
+    jobid: 6
+    wildcards: sample=example
+    threads: 6
+
+[Wed Oct 14 20:09:41 2020]
+rule index:
+    input: data/example, example.fastq
+    output: example.fastq.index, example.fastq.index.fai, example.fastq.index.gzi, example.fastq.index.readdb
+    jobid: 5
+    wildcards: sample=example
+
+[Wed Oct 14 20:09:41 2020]
+Finished job 5.
+1 of 7 steps (14%) done
+[Wed Oct 14 20:09:42 2020]
+Finished job 6.
+2 of 7 steps (29%) done
+
+[Wed Oct 14 20:09:42 2020]
+rule samtools_sort:
+    input: nanopolish_results/mapped/example.bam
+    output: nanopolish_results/mapped/example.sorted.bam
+    jobid: 3
+    wildcards: sample=example
+
+[Wed Oct 14 20:09:43 2020]
+Finished job 3.
+3 of 7 steps (43%) done
+
+[Wed Oct 14 20:09:43 2020]
+rule samtools_index:
+    input: nanopolish_results/mapped/example.sorted.bam
+    output: nanopolish_results/mapped/example.sorted.bam.bai
+    jobid: 4
+    wildcards: sample=example
+
+[Wed Oct 14 20:09:43 2020]
+Finished job 4.
+4 of 7 steps (57%) done
+
+[Wed Oct 14 20:09:43 2020]
+rule call_methylation:
+    input: nanopolish_results/mapped/example.sorted.bam, nanopolish_results/mapped/example.sorted.bam.bai, data/ecoli_k12_mg1655.fasta, example.fastq, example.fastq.index, example.fastq.index.fai, example.fastq.index.gzi, example.fastq.index.readdb
+    output: nanopolish_results/example_nanopolish-log.tsv
+    jobid: 2
+    wildcards: sample=example
+
+[Wed Oct 14 20:09:45 2020]
+Finished job 2.
+5 of 7 steps (71%) done
+
+[Wed Oct 14 20:09:45 2020]
+rule split_cpgs:
+    input: nanopolish_results/example_nanopolish-log.tsv
+    output: nanopolish_results/example_nanopolish-log-perCG.tsv
+    jobid: 1
+    wildcards: sample=example
+
+[Wed Oct 14 20:09:45 2020]
+Finished job 1.
+6 of 7 steps (86%) done
+
+[Wed Oct 14 20:09:45 2020]
+rule create_input_for_comb_model:
+    input: nanopolish_results/example_nanopolish-log-perCG.tsv, script_in_snakemake/format_nanopolish.R
+    output: nanopolish_results/example_nanopolish-perRead-score.tsv
+    jobid: 0
+    wildcards: sample=example
+
+[Wed Oct 14 20:09:45 2020]
+Finished job 0.
+7 of 7 steps (100%) done
+Complete log: /home/admin/comprna/METEORE/.snakemake/log/2020-10-14T200941.002375.snakemake.log

@@ -1,0 +1,56 @@
+Building DAG of jobs...
+Using shell: /bin/bash
+Provided cores: 1
+Rules claiming more threads will be scaled down.
+Job counts:
+	count	jobs
+	1	calculate_frequency
+	1	call_modification
+	1	combine_sites
+	1	extract_feature
+	4
+
+[Wed Oct 14 18:52:30 2020]
+rule extract_feature:
+    input: data/example, data/ecoli_k12_mg1655.fasta
+    output: deepsignal_results/example_deepsignal-feature.tsv
+    jobid: 3
+    wildcards: sample=example
+
+[Wed Oct 14 18:52:52 2020]
+Finished job 3.
+1 of 4 steps (25%) done
+
+[Wed Oct 14 18:52:52 2020]
+rule call_modification:
+    input: deepsignal_results/example_deepsignal-feature.tsv
+    output: deepsignal_results/example_deepsignal-prob.tsv
+    jobid: 2
+    wildcards: sample=example
+
+[Wed Oct 14 18:54:26 2020]
+Finished job 2.
+2 of 4 steps (50%) done
+
+[Wed Oct 14 18:54:26 2020]
+rule calculate_frequency:
+    input: deepsignal_results/example_deepsignal-prob.tsv
+    output: deepsignal_results/example_deepsignal-freq-perCG-raw.tsv
+    jobid: 1
+    wildcards: sample=example
+
+[Wed Oct 14 18:54:27 2020]
+Finished job 1.
+3 of 4 steps (75%) done
+
+[Wed Oct 14 18:54:27 2020]
+rule combine_sites:
+    input: deepsignal_results/example_deepsignal-freq-perCG-raw.tsv, script_in_snakemake/run_deepsignal.R
+    output: deepsignal_results/example_deepsignal-freq-perCG.tsv
+    jobid: 0
+    wildcards: sample=example
+
+[Wed Oct 14 18:54:27 2020]
+Finished job 0.
+4 of 4 steps (100%) done
+Complete log: /home/admin/comprna/METEORE/.snakemake/log/2020-10-14T185230.976065.snakemake.log

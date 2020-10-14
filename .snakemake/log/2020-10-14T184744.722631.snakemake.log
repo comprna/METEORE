@@ -1,0 +1,44 @@
+Building DAG of jobs...
+Using shell: /bin/bash
+Provided cores: 1
+Rules claiming more threads will be scaled down.
+Job counts:
+	count	jobs
+	1	calculate_frequency
+	1	call_modification
+	1	combine_sites
+	1	extract_feature
+	4
+
+[Wed Oct 14 18:47:44 2020]
+rule extract_feature:
+    input: data/example, data/ecoli_k12_mg1655.fasta
+    output: deepsignal_results/example_deepsignal-feature.tsv
+    jobid: 3
+    wildcards: sample=example
+
+[Wed Oct 14 18:48:06 2020]
+Finished job 3.
+1 of 4 steps (25%) done
+
+[Wed Oct 14 18:48:06 2020]
+rule call_modification:
+    input: deepsignal_results/example_deepsignal-feature.tsv
+    output: deepsignal_results/example_deepsignal-prob.tsv
+    jobid: 2
+    wildcards: sample=example
+
+Terminating processes on user request, this might take some time.
+[Wed Oct 14 18:50:56 2020]
+Error in rule call_modification:
+    jobid: 2
+    output: deepsignal_results/example_deepsignal-prob.tsv
+
+RuleException:
+CalledProcessError in line 16 of /home/admin/comprna/METEORE/Deepsignal:
+Command ' set -euo pipefail;  deepsignal call_mods --input_path deepsignal_results/example_deepsignal-feature.tsv --is_gpu no --nproc 10 --model_path data/model.CpG.R9.4_1D.human_hx1.bn17.sn360.v0.1.7+/bn_17.sn_360.epoch_9.ckpt --result_file deepsignal_results/example_deepsignal-prob.tsv ' returned non-zero exit status 1.
+  File "/home/admin/comprna/METEORE/Deepsignal", line 16, in __rule_call_modification
+  File "/home/admin/Lib/anaconda3/envs/meteore_deepsignal_env/lib/python3.6/concurrent/futures/thread.py", line 56, in run
+Removing output files of failed job call_modification since they might be corrupted:
+deepsignal_results/example_deepsignal-prob.tsv
+Complete log: /home/admin/comprna/METEORE/.snakemake/log/2020-10-14T184744.722631.snakemake.log

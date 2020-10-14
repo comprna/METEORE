@@ -1,0 +1,20 @@
+Building DAG of jobs...
+Using shell: /bin/bash
+Provided cores: 1
+Rules claiming more threads will be scaled down.
+Job counts:
+	count	jobs
+	1	create_input_for_comb_model
+	1
+
+[Wed Oct 14 19:03:02 2020]
+rule create_input_for_comb_model:
+    input: deepsignal_results/example_deepsignal-prob.tsv, script_in_snakemake/format_deepsignal.R
+    output: deepsignal_results/example_deepsignal-perRead-score.tsv
+    jobid: 0
+    wildcards: sample=example
+
+[Wed Oct 14 19:03:02 2020]
+Finished job 0.
+1 of 1 steps (100%) done
+Complete log: /home/admin/comprna/METEORE/.snakemake/log/2020-10-14T190302.128566.snakemake.log
