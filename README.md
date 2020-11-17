@@ -534,7 +534,7 @@ python meteore_reg.py --train set1_nanopolish.tsv set1_deepsignal.tsv \
       --test set2_nanopolish.tsv set2_deepsignal.tsv --testIsTraining \
       --trunc_min -50 -5 --trunc_max 50 5 --filter 0.1
 ```
-# The following command-line options are available:
+### The following command-line options are available:
 ```
 python meteore_reg.py -h
 usage: meteore_reg.py [-h] --train TRAIN [TRAIN ...] --train_desc TRAIN_DESC [--test [TEST [TEST ...]]]
@@ -564,27 +564,27 @@ optional arguments:
   --testIsTraining      Use functions for handling training data for the test parameters
   --no_scaling          Disable score scaling
 ```
-## Regression specific options
+# Regression specific options
 
-# Several arguments are specific to the REG model and deserve further discussion.
+### Several arguments are specific to the REG model and deserve further discussion.
 
-# --trunc_min INT ... --trunc_max INT ...
+#### --trunc_min INT ... --trunc_max INT ...
 The trunc_min and trunc_max parameters can be used to restrict the useful range of log difference scores on a per-tool basis. 
 Most of the existing methylation calling tools are well behaved but Nanopolish in particular can output extreme scores. By 
 default REG scales each tool's scores linearly between 0 and 1. Extreme positive or negative values will reduce the 
 contribution by scores that are less extreme but still meaningful indictors of methylation status. Values less than 
 trunc_min INT for tool N will be replaced with the user provided score, and vice versa for the scores larger than trunc_max INT.
 
-# --inc_pred
+#### --inc_pred
 Enables methylation labels to be considered as a contributor to the prediction model. This requires the test data to have the same format as the test data, with "group" and "label" columns. In some case it can improve prediction if the tool makes good classifications in spite of oddly distributed scores.
 
-# --filter FLOAT 0..1
+#### --filter FLOAT 0..1
 Filters out a fixed proportion of reads, evenly distributed either side of the scaling mid-point. If scaling is disabled then the mean score is considered the mid-point.
 
-# --testIsTraining
+#### --testIsTraining
 Informs REG to use the input format corresponding to training data for test data as well.
 
-# --no_scaling
+#### --no_scaling
 Disables MinMax (0..1) scaling. Not recommended in general but might be necessary for tools with wildly different scoring systems.
 
 ## Example run report
@@ -596,7 +596,7 @@ Filter  Ignored deepsignal_pass deepsignal_prop nanopolish_pass nanopolish_prop 
 -1      0       5728226 0.9151707857313122      5332267 0.8519103436420188      5778967 0.923277428318178
 ```
 
-# REG reports a standard summary of the training and test accuracy.
+### REG reports a standard summary of the training and test accuracy.
 
 Filter is the proportion of (presumably low-accuracy) reads to be removed, with -1 indicated it is disabled. Likewise the Ignored column is the corresponding number of reads removed by filtering.
 Each tool is then reported with the number of site observations that match the expected methylation status (not accurate for hemi-methylated sites), and the overall proportion accuracy.
