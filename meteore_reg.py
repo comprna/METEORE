@@ -1,6 +1,12 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 
 from sklearn.linear_model import RidgeCV
+#from skleanr.linear_model import Ridge, LinearRegression, SGDRegressor,\
+#        ElasticNet, Lars, Lasso, ARDRegression, BayesianRidge, HuberRegressor,\
+#        PoissonRegressor, PassiveAggressiveRegressor
+#from sklearn.svm import LinearSVR
+#from sklearn.ensemble import RandomForestRegressor
+#from sklearn.ensemble import StackingRegressor
 from sklearn.preprocessing import MinMaxScaler
 
 import numpy as np
@@ -8,6 +14,7 @@ import sys
 from math import floor
 from argparse import ArgumentParser as AP
 from collections import Counter
+import gzip
 
 """
 Author: Cameron Jack, ANU Bioinformatics Consultancy, Australian National University (ANU)
@@ -20,9 +27,16 @@ Truth group (label), read ID and locus must be shared across all inputs.
 TODO: imputation of missing loci. Also, trying a simple linear regression model would be interesting.
 """
 
+def myopen(fn):
+    """ Bob's Buckley's function to handle gzip transparently """
+    if fn.endswith('.gz') :
+        return gzip.open(fn, 'rt')
+    return open(fn, errors='ignore')
+
+
 def parse_training_loci(fn):
     """ Get all reads and positions to check for overlap before reading values """
-    with open(fn, 'rt') as f:
+    with myopen(fn) as f:
         group_read_pos = set()
         for i, row in enumerate(f):
             if i == 0:
@@ -42,7 +56,7 @@ def parse_training_values(fn, shared_ids, trunc_score_min, trunc_score_max, debu
     """ parse file contents into dictionary of [(group,read,pos)] = (strand, label, prediction, score) """
     truncated = 0
     contents = {}
-    with open(fn, 'rt') as f:
+    with myopen(fn) as f:
         for i, row in enumerate(f):
             if i == 0:
                 continue
@@ -71,7 +85,7 @@ def parse_training_values(fn, shared_ids, trunc_score_min, trunc_score_max, debu
 
 def parse_test_loci(fn):
     """ Parse test data (doesn't contain known outcomes or groups) """
-    with open(fn, 'rt') as f:
+    with myopen(fn) as f:
         read_pos = set()
         for i, row in enumerate(f):
             if i == 0:
@@ -92,10 +106,11 @@ def parse_test_values(fn, shared_ids, trunc_score_min, trunc_score_max, debug=Fa
     If first, place into cols 0, 2, else cols 1, 3
     If trunc_score_min/max then set more extreme scores to this. Important for balancing
     contributions to regression.
+    modify in place
     """
     truncated = 0
     contents = {}
-    with open(fn, 'rt') as f:
+    with myopen(fn) as f:
         for i, row in enumerate(f):
             if i == 0:
                 continue
@@ -202,7 +217,7 @@ def load_training_data(training_fns, trunc_min_scores,
     """ First parse group, read and position to find shared data points
         Then read in training scores, truncating as appropriate """
     # Parse file twice. First time get all the loci, second time all the value data
-    training_ids = [parse_training_loci(t_ids) for t_ids in training_fns]
+    training_ids = [parse_training_loci(t_fn) for t_fn in training_fns]
     shared_ids = set.intersection(*training_ids)
     id_list = sorted(shared_ids)
     if debug:
@@ -236,7 +251,7 @@ def load_test_data(test_fns, trunc_min_scores,
     """ First parse group, read and position to find shared data points
         Then read in test scores, truncating as appropriate """
     # Parse file twice. First time get all the loci, second time all the value data
-    test_ids = [parse_test_loci(t_ids) for t_ids in test_fns]
+    test_ids = [parse_test_loci(t_fn) for t_fn in test_fns]
     shared_ids = set.intersection(*test_ids)
     id_list = sorted(shared_ids)
     if debug:
