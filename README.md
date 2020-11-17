@@ -589,7 +589,9 @@ Disables MinMax (0..1) scaling. Not recommended in general but might be necessar
 
 ## Example run report
 ```
-python meteore_reg.py --train set1_deepsignal.tsv.gz set1_nanopolish_updated.tsv.gz --tool_names deepsignal nanopolish --train_desc mix1 --test set2_deepsignal.tsv.gz set2_nanopolish.tsv.gz --test_desc mix2 --testIsTraining --trunc_min -5 -50 --trunc_max 5 50
+python meteore_reg.py --train set1_deepsignal.tsv.gz set1_nanopolish_updated.tsv.gz --tool_names deepsignal nanopolish \
+  --train_desc mix1 --test set2_deepsignal.tsv.gz set2_nanopolish.tsv.gz --test_desc mix2 --testIsTraining \
+  --trunc_min -5 -50 --trunc_max 5 50
 Filter  Ignored deepsignal_pass deepsignal_prop nanopolish_pass nanopolish_prop Model_succ      Model_prop
 -1      0       2981104 0.9105415715991803      2729348 0.8336457961081127      3029092 0.9251989163070138
 Filter  Ignored deepsignal_pass deepsignal_prop nanopolish_pass nanopolish_prop Model_succ      Model_prop
@@ -599,5 +601,7 @@ Filter  Ignored deepsignal_pass deepsignal_prop nanopolish_pass nanopolish_prop 
 ### REG reports a standard summary of the training and test accuracy.
 
 Filter is the proportion of (presumably low-accuracy) reads to be removed, with -1 indicated it is disabled. Likewise the Ignored column is the corresponding number of reads removed by filtering.
+
 Each tool is then reported with the number of site observations that match the expected methylation status (not accurate for hemi-methylated sites), and the overall proportion accuracy.
+
 Finally the combined regression model numbers are reported for training data where labels are available to ascertain truth.
