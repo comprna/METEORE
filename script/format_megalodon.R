@@ -25,4 +25,5 @@ df <- df %>% select(1,2,3,6)
 colnames(df) <- c("ID", "Pos", "Strand", "Score")
 df <- df %>% mutate(Strand = if_else(Strand == 1, "+", "-"))
 df[,"Pos"] <- df[,"Pos"]+1
+df$Pos <- format(df$Pos,scientific=FALSE)
 write.table(df, file=args[2], sep = "\t", row.names = FALSE, col.names = TRUE, quote = FALSE)

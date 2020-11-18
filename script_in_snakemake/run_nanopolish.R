@@ -60,4 +60,5 @@ df <- df[,list(df.freq = mean(df.freq),
 df <- data.frame(df)
 
 colnames(df) <- c("Chr", "Pos", "Methyl_freq", "Cov")
+df$Pos <- format(df$Pos,scientific=FALSE)
 write.table(df, file=args[2],  quote = FALSE, sep = "\t", col.names = TRUE, row.names = FALSE)

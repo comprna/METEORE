@@ -16,5 +16,5 @@ df$Score <- log2(df$V8/df$V7)
 df <- df %>% select(3,1,2,6)
 colnames(df) <- c("ID","Pos","Strand","Score")
 df[,"Pos"] <- df[,"Pos"]+1 
-
+df$Pos <- format(df$Pos,scientific=FALSE)
 write.table(df, file=args[2], quote=FALSE, sep ="\t", col.names = TRUE, row.names = FALSE)

@@ -12,4 +12,5 @@ df <- read.table(args[1], header = TRUE, sep = "\t")
 colnames(df) <- c("Chr", "Pos", "Strand", "Score", "ID")
 df[df$Strand == "-","Pos"] <- df[df$Strand == "-","Pos"]+1
 df <- df[, c("ID", "Pos", "Strand", "Score")]
+df$Pos <- format(df$Pos,scientific=FALSE)
 write.table(df, file=args[2], sep = "\t", row.names = FALSE, col.names = TRUE, quote = FALSE)

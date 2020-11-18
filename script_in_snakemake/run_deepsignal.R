@@ -26,5 +26,5 @@ df <- df[,list(Methyl_freq = mean(Methyl_freq),
                Cov = sum(Cov)),
                list(Chr,Pos)]
 df <- data.frame(df)
-
+df$Pos <- format(df$Pos,scientific=FALSE)
 write.table(df, file=args[2], quote=FALSE, sep ="\t", col.names = TRUE, row.names = FALSE)
