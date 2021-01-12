@@ -6,7 +6,7 @@
 # This script is to:
 # -calculate per-site methylation frequency (no. of methylated reads/total reads) from the log-likelihood ratio
 # -use the cutoff of 2.5 suggested by Nanopolish to remove non-significant methylation call
-# 	-log-likelihood ratio >=2.5, considered as methylated 
+# 	-log-likelihood ratio >=2.5, considered as methylated
 # 	-log-likelihood ratio <=-2.5, considered as unmethylated
 
 library(data.table)
@@ -23,7 +23,7 @@ if (length(args)==0) {
   args[2] = "nanopolish_freq_perCG.txt"
 }
 
-df <- read.table(args[1], header=TRUE, sep = "\t")
+df <- read.table(args[1], header=TRUE, sep = "\t", stringsAsFactors = TRUE) ###############
 df <- select(df, -Read_ID)
 df$Chr <- as.character(levels(df$Chr))[df$Chr]
 df$Strand <- as.character(levels(df$Strand))[df$Strand]
@@ -33,8 +33,8 @@ df <- filter(df, Log.like.ratio >= 2.5 | Log.like.ratio <= -2.5)
 df[df$Strand == "-", "Pos"] <- df[df$Strand == "-", "Pos"]+1
 
 # The position for same site on differnt stands repeats themselves, need to count no. of methylated CpG and unmethylated CpG using plyr package
-df_m <- count(df[df$Log.like.ratio > 0, ], c("Chr", "Pos","Strand"))
-df_unm <- count(df[df$Log.like.ratio < 0, ], c("Chr", "Pos","Strand"))
+df_m <- plyr::count(df[df$Log.like.ratio > 0, ], c("Chr", "Pos","Strand")) ##########
+df_unm <- plyr::count(df[df$Log.like.ratio < 0, ], c("Chr", "Pos","Strand"))########
 colnames(df_m)[4] <- "Num.methylated"
 colnames(df_unm)[4] <- "Num.unmethylated"
 # New df
