@@ -348,6 +348,7 @@ We did not develop a snakemake pipeline for Megalodon as it can be run with a si
 Please check out [Megalodon GitHub Page](https://github.com/nanoporetech/megalodon) for more details. Note that the new release of Megalodon requires Guppy basecaller to be installed to run Megalodon for the basecalling step. It uses Guppy (GPU on Linux) by default.
 
 **Modified base detection**
+
 Here we used the most recent basecalling models in **Rerio** that provides a more accurate methylation result than the original model. See [Rerio](https://github.com/nanoporetech/rerio) for installing Rerio models.
 ```
 megalodon data/example/ --outputs mods --reference data/ecoli_k12_mg1655.fasta --mod-motif m CG 0 --write-mods-text --processes 10 --guppy-server-path /<path_to_ont-guppy-gpu>/bin/guppy_basecall_server --guppy-params "--num_callers 5 --ipc_threads 6" --guppy-config res_dna_r941_min_modbases_5mC_CpG_v001.cfg --devices cuda:0 --overwrite
@@ -360,6 +361,7 @@ megalodon data/example/ --outputs mods --reference data/ecoli_k12_mg1655.fasta -
 This will produce the `megalodon_results` directory which contains logs, per-read modified base output `per_read_modified_base_calls.txt`, per-site modified base output `modified_bases.5mC.bed`.
 
 **Per-site methylation frequency output**
+
 We provide a bash script to generate the methylation frequency file and the input file for combined model usage, which are in the same format used in every method. Run the bash script with ***your preferred filename*** (eg. example) for the output files:
 ```
 ./script/megalodon.sh example
