@@ -98,8 +98,10 @@ mamba install -c bioconda nanopolish samtools r-data.table r-dplyr r-plyr
 ```
 
 **Installing packages using .yml file**
-`conda env create -f nanopolish.yml`
-`conda activate meteore_nanopolish_env`
+```
+conda env create -f nanopolish.yml
+conda activate meteore_nanopolish_env
+```
 
 ### Run the snakemake
 
