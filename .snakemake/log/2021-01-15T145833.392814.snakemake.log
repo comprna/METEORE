@@ -1,0 +1,21 @@
+Building DAG of jobs...
+Using shell: /bin/bash
+Provided cores: 12
+Rules claiming more threads will be scaled down.
+Conda environments: ignored
+Job counts:
+	count	jobs
+	1	create_input_for_comb_model
+	1
+
+[Fri Jan 15 14:58:33 2021]
+rule create_input_for_comb_model:
+    input: nanopolish_results/example_nanopolish-log-perCG.tsv, script_in_snakemake/format_nanopolish.R
+    output: nanopolish_results/example_nanopolish-perRead-score.tsv
+    jobid: 0
+    wildcards: sample=example
+
+[Fri Jan 15 14:58:33 2021]
+Finished job 0.
+1 of 1 steps (100%) done
+Complete log: /home/admin/comprna/METEORE/.snakemake/log/2021-01-15T145833.392814.snakemake.log
