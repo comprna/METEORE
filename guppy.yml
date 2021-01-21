@@ -158,10 +158,10 @@ dependencies:
   - zlib=1.2.11=h7b6447c_3
   - zstd=1.3.3=1
   - pip:
+    - cython
     - h5py==2.10.0
     - ont-fast5-api==2.0.0
     - progressbar33==2.4
     - python-rocksdb==0.6.7
     - six==1.13.0
-prefix: /home/admin/Lib/anaconda3/envs/guppy_cpg_snakemake
 

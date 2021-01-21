@@ -21,4 +21,3 @@ dependencies:
   - samtools=1.7=1
   - snakemake=5.26.1=0
   - zlib=1.2.11=h516909a_1009
-prefix: /home/admin/Lib/anaconda3/envs/meteore_nanopolish_env
