@@ -118,6 +118,9 @@ dependencies:
   - python_abi=3.6=1_cp36m
   - pytz=2020.1=pyh9f0ad1d_0
   - pyyaml=5.3.1=py36h8c4c3a4_0
+  - r-data.table=1.13.0=r36h0eb13af_0
+  - r-dplyr=1.0.2=r36h0357c0b_0
+  - r-plyr=1.8.6=r36h0357c0b_1
   - ratelimiter=1.2.0=py36h9f0ad1d_1001
   - readline=7.0=h7b6447c_5
   - requests=2.24.0=pyh9f0ad1d_0
