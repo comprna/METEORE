@@ -62,7 +62,7 @@ bash Miniconda3-latest-Linux-x86_64.sh
 ```
 Accept the license terms during installation.
 
-Install `Mamba` via conda to install Snakemake for each pipeline later. See [Snakemake documentation](https://snakemake.readthedocs.io/en/stable/getting_started/installation.html) for more details.
+For performance and compatibility reasons you should install `Mamba` via conda to install Snakemake for each pipeline later. See [Snakemake documentation](https://snakemake.readthedocs.io/en/stable/getting_started/installation.html) for more details.
 ```
 conda install -c conda-forge mamba
 ```
@@ -99,7 +99,7 @@ mamba install -c bioconda nanopolish samtools r-data.table r-dplyr r-plyr
 
 **Installing packages using .yml file**
 ```
-conda env create -f nanopolish.yml
+mamba env create -f nanopolish.yml
 conda activate meteore_nanopolish_env
 ```
 
@@ -150,12 +150,12 @@ ID                                      Pos       Strand    Score
 ```bash
 # Create an environment with Snakemake installed
 # Here we install Python 3.6 with older version of Snakemake so we can install tensorflow==1.13.1 later
-conda create -n meteore_deepsignal_env python=3.6 snakemake=5.3.0
+mamba create -n meteore_deepsignal_env -c bioconda -c conda-forge python=3.6.1 snakemake=5.3.0
 # Activate
 conda activate meteore_deepsignal_env
 # Install all required packages using pip
 # We will run DeepSignal on CPUs so we install the CPU version of tensorflow
-pip install deepsignal 'tensorflow==1.13.1' ont-tombo ont-fast5-api
+pip install numpy deepsignal 'tensorflow==1.13.1' ont-tombo ont-fast5-api
 ```
 
 Alternatively, you can run DeepSignal on a GPU-enabled machine. Then you can install the GPU version of tensorflow. Please check out [DeepSignal Github Page](https://github.com/bioinfomaticsCSU/deepsignal#Installation) for more information.
@@ -301,7 +301,7 @@ git clone https://github.com/kpalin/gcf52ref.git
 
 Then you can create the environment from the `guppy.yml` file:
 ```
-conda env create -f guppy.yml
+mamba env create -f guppy.yml
 ```
 Then activate the Conda environment:
 ```
