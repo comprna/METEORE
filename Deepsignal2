@@ -1,0 +1,17 @@
+rule combine_sites:
+    input:
+        freq="deepsignal_results/{sample}_deepsignal-freq-perCG-raw.tsv",
+        script="script_in_snakemake/run_deepsignal.R"
+    output:
+        "deepsignal_results/{sample}_deepsignal-freq-perCG.tsv"
+    shell:
+        "Rscript {input.script} {input.freq} {output}"
+
+rule create_input_for_comb_model:
+    input:
+        prob="deepsignal_results/{sample}_deepsignal-prob.tsv",
+        script="script_in_snakemake/format_deepsignal.R"
+    output:
+        "deepsignal_results/{sample}_deepsignal-perRead-score.tsv"
+    shell:
+        "Rscript {input.script} {input.prob} {output}"
