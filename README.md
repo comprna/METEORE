@@ -147,8 +147,8 @@ ID                                      Pos       Strand    Score
 
 ### Create and activate the Conda environment
 
-```bash
 # Two environments with Snakemake installed are required. The first is for Deepsignal itself.
+```
 # Here we install Python 3.6 with older version of Snakemake so we can install tensorflow==1.13.1 later
 mamba create -n meteore_deepsignal_env -c bioconda -c conda-forge python=3.6.1 snakemake=5.3.0
 # Activate
@@ -185,6 +185,7 @@ NC_000913.3   3501290   +         3501290       1.947               5.053       
 NC_000913.3   3501291   -         1140360       3.103               1.897             1                4                 5        0.200     AAAGTCCACGGTGCTTT
 NC_000913.3   3501308   +         3501308       1.032               5.968             7                0                 7        1.000     CTGGTCACCGAAAATAT
 NC_000913.3   3501309   -         1140342       1.493               3.507             3                2                 5        0.600     CATATTTTCGGTGACCA
+```
 
 ### Produce freq-perCG.tsv files and Prepare the input file for combined model usage
 Deactivate the meteore_deepsignal_env environment before creating a new environment. We use Conda rather than Mamba to avoid any caching issues (known bug in Mamba)
