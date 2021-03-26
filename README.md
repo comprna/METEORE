@@ -6,7 +6,7 @@
 METEORE provides snakemake pipelines for various tools to detect DNA methylation from Nanopore sequencing reads. Additionally, it provides
 new predictive models (random forest and multiple linear regression) that combine the outputs from the tools to produce a consensus prediction with higher accuracy than the individual tools.
 
-** NEW UPDATES (Mar-2021)**
+**NEW UPDATES (Mar-2021)**
 METEORE can now produce two per-site result files in an **augmented BED format** for each tool except for DeepMod (which will be updated very soon). The first output file contains the following fields:
 1. Reference chromosome
 2. Start position in chromosome
@@ -14,6 +14,7 @@ METEORE can now produce two per-site result files in an **augmented BED format**
 4. Read coverage
 5. Methylation (i.e. methylation frequency)
 6. Strandedness
+
 In the second output file, we combine the methylation predictions from both strands on CpG sites by averaging the methylation frequencies and adding up the coverage. This output file contains the following fields:
 1. Reference chromosome
 2. Start position in chromosome
@@ -145,6 +146,7 @@ NC_000913.3   3499563     +         8.26            094dfe6b-23ed-4195-8876-805a
   1. Reference chromosome
   2. Start position in chromosome
   3. End position in chromosome
+
 The remaining columns represent:
   4. Read coverage
   5. Methylation (i.e. methylation frequency)
@@ -242,6 +244,7 @@ snakemake -s Deepsignal2 deepsignal_results/example_deepsignal-freq-perCG.tsv --
   1. Reference chromosome
   2. Start position in chromosome
   3. End position in chromosome
+
 The remaining columns represent:
   4. Read coverage
   5. Methylation (i.e. methylation frequency)
@@ -344,7 +347,7 @@ end_position = 4584088
 
 ### Modified basecalling
 
-You need to basecall with the standalone Guppy basecaller before running the Snakemake pipeline. The pipeline was only designed to process and analyze the Guppy's fast5 output using the open-source custom scripts available from https://github.com/kpalin/gcf52ref. This was only tested with Guppy (version 3.6) when modified basecalling was introduced. **We recommend to use [Megalodon](https://github.com/nanoporetech/megalodon) (ONT-developed tool) coupled with Guppy for methylation calling (see Megalodon section below).**
+You need to basecall with the standalone Guppy basecaller before running the Snakemake pipeline. The pipeline was only designed to process and analyze the Guppy's fast5 output using the open-source custom scripts available from https://github.com/kpalin/gcf52ref. This was only tested with Guppy (version 3.6) when modified basecalling was introduced. **We highly recommend to use [Megalodon](https://github.com/nanoporetech/megalodon) (ONT-developed tool) coupled with Guppy for methylation calling (see Megalodon section below).**
 
 Guppy basecaller is only available to Oxford Nanopore Technologies' customers via the community site. Please check the [community page](https://community.nanoporetech.com/downloads) for download and installation instructions.
 
