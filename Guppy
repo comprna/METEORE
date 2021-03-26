@@ -43,9 +43,10 @@ rule calculate_frequency:
         script="script_in_snakemake/run_guppy.R",
         log="guppy_results/{sample}_guppy-log-perCG.tsv"
     output:
-        "guppy_results/{sample}_guppy-freq-perCG.tsv"
+      file1="guppy_results/{sample}_guppy-freq-perCG.tsv",
+      file2="guppy_results/{sample}_guppy-freq-perCG-combStrand.tsv"
     shell:
-        "Rscript {input.script} {input.log} {output}"
+        "Rscript {input.script} {input.log} {output.file1} {output.file2}"
 
 rule create_input_for_comb_model:
     input:

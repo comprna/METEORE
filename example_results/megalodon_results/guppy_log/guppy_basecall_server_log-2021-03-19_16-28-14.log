@@ -1,0 +1,54 @@
+2021-03-19 16:28:14.513248 [guppy/message] ONT Guppy basecall server software version 4.4.2+9623c16, client-server API version 5.0.0
+log path:            megalodon_results/guppy_log
+chunk size:          2000
+chunks per runner:   512
+max queued reads:    2000
+num basecallers:     10
+num socket threads:  2
+max returned events: 50000
+cpu mode:             ON
+threads per caller:  4
+2021-03-19 16:28:14.513322 [guppy/info] crashpad_handler not supported on this platform.
+2021-03-19 16:28:14.513542 [guppy/info] Listening on port 35257.
+2021-03-19 16:28:15.475300 [guppy/message] 
+Config loaded:
+config file:               ./../../Lib/rerio/basecall_models/res_dna_r941_min_modbases_5mC_CpG_v001.cfg
+model file:                ./../../Lib/rerio/basecall_models/res_dna_r941_min_modbases_5mC_CpG_v001.jsn
+model version id           None
+adapter scaler model file: None
+2021-03-19 16:28:15.475741 [guppy/message] Starting server on port: 35257
+2021-03-19 16:28:15.561882 [guppy/info] client connection request. ["res_dna_r941_min_modbases_5mC_CpG_v001:>timeout_interval=15000>client_name=:::"]
+2021-03-19 16:28:15.562037 [guppy/info] New client connected [anonymous_client_1] assigned id 1 (connection string = 'res_dna_r941_min_modbases_5mC_CpG_v001:>timeout_interval=15000>client_name=:::').
+2021-03-19 16:28:15.655704 [guppy/info] Client with id 1 has disconnected.
+2021-03-19 16:28:15.838499 [guppy/info] client connection request. ["res_dna_r941_min_modbases_5mC_CpG_v001:>timeout_interval=15000>client_name=:::"]
+2021-03-19 16:28:15.838557 [guppy/info] New client connected [anonymous_client_2] assigned id 2 (connection string = 'res_dna_r941_min_modbases_5mC_CpG_v001:>timeout_interval=15000>client_name=:::').
+2021-03-19 16:28:15.841375 [guppy/info] client connection request. ["res_dna_r941_min_modbases_5mC_CpG_v001:>timeout_interval=15000>client_name=:::"]
+2021-03-19 16:28:15.841418 [guppy/info] New client connected [anonymous_client_3] assigned id 3 (connection string = 'res_dna_r941_min_modbases_5mC_CpG_v001:>timeout_interval=15000>client_name=:::').
+2021-03-19 16:28:15.847590 [guppy/info] client connection request. ["res_dna_r941_min_modbases_5mC_CpG_v001:>timeout_interval=15000>client_name=:::"]
+2021-03-19 16:28:15.847583 [guppy/info] client connection request. ["res_dna_r941_min_modbases_5mC_CpG_v001:>timeout_interval=15000>client_name=:::"]
+2021-03-19 16:28:15.847632 [guppy/info] New client connected [anonymous_client_4] assigned id 4 (connection string = 'res_dna_r941_min_modbases_5mC_CpG_v001:>timeout_interval=15000>client_name=:::').
+2021-03-19 16:28:15.847637 [guppy/info] New client connected [anonymous_client_5] assigned id 5 (connection string = 'res_dna_r941_min_modbases_5mC_CpG_v001:>timeout_interval=15000>client_name=:::').
+2021-03-19 16:28:15.849102 [guppy/info] client connection request. ["res_dna_r941_min_modbases_5mC_CpG_v001:>timeout_interval=15000>client_name=:::"]
+2021-03-19 16:28:15.849130 [guppy/info] New client connected [anonymous_client_6] assigned id 6 (connection string = 'res_dna_r941_min_modbases_5mC_CpG_v001:>timeout_interval=15000>client_name=:::').
+2021-03-19 16:28:15.851782 [guppy/info] client connection request. ["res_dna_r941_min_modbases_5mC_CpG_v001:>timeout_interval=15000>client_name=:::"]
+2021-03-19 16:28:15.851819 [guppy/info] New client connected [anonymous_client_7] assigned id 7 (connection string = 'res_dna_r941_min_modbases_5mC_CpG_v001:>timeout_interval=15000>client_name=:::').
+2021-03-19 16:28:15.853175 [guppy/info] client connection request. ["res_dna_r941_min_modbases_5mC_CpG_v001:>timeout_interval=15000>client_name=:::"]
+2021-03-19 16:28:15.853209 [guppy/info] New client connected [anonymous_client_8] assigned id 8 (connection string = 'res_dna_r941_min_modbases_5mC_CpG_v001:>timeout_interval=15000>client_name=:::').
+2021-03-19 16:28:15.857295 [guppy/info] client connection request. ["res_dna_r941_min_modbases_5mC_CpG_v001:>timeout_interval=15000>client_name=:::"]
+2021-03-19 16:28:15.857332 [guppy/info] New client connected [anonymous_client_9] assigned id 9 (connection string = 'res_dna_r941_min_modbases_5mC_CpG_v001:>timeout_interval=15000>client_name=:::').
+2021-03-19 16:28:15.859387 [guppy/info] client connection request. ["res_dna_r941_min_modbases_5mC_CpG_v001:>timeout_interval=15000>client_name=:::"]
+2021-03-19 16:28:15.859394 [guppy/info] client connection request. ["res_dna_r941_min_modbases_5mC_CpG_v001:>timeout_interval=15000>client_name=:::"]
+2021-03-19 16:28:15.859425 [guppy/info] New client connected [anonymous_client_10] assigned id 10 (connection string = 'res_dna_r941_min_modbases_5mC_CpG_v001:>timeout_interval=15000>client_name=:::').
+2021-03-19 16:28:15.859428 [guppy/info] New client connected [anonymous_client_11] assigned id 11 (connection string = 'res_dna_r941_min_modbases_5mC_CpG_v001:>timeout_interval=15000>client_name=:::').
+2021-03-19 16:30:23.495396 [guppy/info] Client with id 9 has timed out.
+2021-03-19 16:30:23.495524 [guppy/info] Client with id 9 has disconnected.
+2021-03-19 16:32:03.506729 [guppy/info] Client with id 3 has timed out.
+2021-03-19 16:32:03.506826 [guppy/info] Client with id 3 has disconnected.
+2021-03-19 16:32:20.508616 [guppy/info] Client with id 2 has timed out.
+2021-03-19 16:32:20.508702 [guppy/info] Client with id 2 has disconnected.
+2021-03-19 16:32:48.511114 [guppy/info] Client with id 5 has timed out.
+2021-03-19 16:32:48.511204 [guppy/info] Client with id 5 has disconnected.
+2021-03-19 16:33:03.512441 [guppy/info] Client with id 7 has timed out.
+2021-03-19 16:33:03.512529 [guppy/info] Client with id 7 has disconnected.
+2021-03-19 16:33:23.514129 [guppy/info] Client with id 4 has timed out.
+2021-03-19 16:33:23.514200 [guppy/info] Client with id 4 has disconnected.

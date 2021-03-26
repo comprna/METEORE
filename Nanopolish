@@ -68,9 +68,10 @@ rule calculate_frequency:
         script="script_in_snakemake/run_nanopolish.R",
         log="nanopolish_results/{sample}_nanopolish-log-perCG.tsv"
     output:
-        "nanopolish_results/{sample}_nanopolish-freq-perCG.tsv"
+        file1="nanopolish_results/{sample}_nanopolish-freq-perCG.tsv",
+        file2="nanopolish_results/{sample}_nanopolish-freq-perCG-combStrand.tsv"
     shell:
-        "Rscript {input.script} {input.log} {output}"
+        "Rscript {input.script} {input.log} {output.file1} {output.file2}"
 
 rule create_input_for_comb_model:
     input:

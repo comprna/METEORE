@@ -2,38 +2,44 @@
 
 # Author: Zaka Yuen , JCSMR, ANU
 # Created on May 2020
+# Modified on March 2021
 
 # This script is to:
 # -combine methylation freq and coverage outputs from Tombo into one dataframe
-# -combine the CpG methylation calls from both strands into a single strand for a CpG site
+# -generate 2 outputs:
+#   -Retain information from both strands (chr, start, end, cov, methylation, strand)
+#   -Combine information from both strands (chr, start, end, cov, methylation)
 
 library(dplyr)
 library(data.table)
 
 args = commandArgs(trailingOnly=TRUE)
 
-# test if there is at least one argument: if not, return an error
-if (length(args)==0 | length(args)==1) {
-  stop("Please input your methylation score output from Tombo and also your coverage output from Tombo", call.=FALSE)
-} else if (length(args)==2) {
-  # default output file
-  args[3] = "tombo_freq-perCG.txt"
-}
+tb.freq <- read.table(args[1], header = TRUE, sep = "\t", stringsAsFactors = TRUE)
+tb.cov <- read.table(args[2], header = TRUE, sep = "\t", stringsAsFactors = TRUE)
+colnames(tb.freq) <- c("Chr", "Pos_end", "Methylation", "Strand")
+colnames(tb.cov) <- c("Chr", "Pos_end", "Coverage", "Strand")
+df <- inner_join(tb.cov, tb.freq, by = c("Chr", "Pos_end", "Strand"))
+######################################### Retain methylation on both strands for a CpG site ####################################
+df_1 <- df
+df_1$Pos_start <- df_1$Pos_end-1
+df_1 <- select(df_1, Chr, Pos_start, Pos_end, Coverage, Methylation, Strand)
+df_1$Pos_start <- format(df_1$Pos_start, scientific = FALSE)
+df_1$Pos_end <- format(df_1$Pos_end, scientific = FALSE)
+write.table(df_1, file=args[3],  quote = FALSE, sep = "\t", col.names = TRUE, row.names = FALSE)
 
-tb.freq <- read.table(args[1], header = TRUE, sep = "\t")
-tb.cov <- read.table(args[2], header = TRUE, sep = "\t")
-colnames(tb.freq) <- c("Chr", "Pos", "Methyl_freq", "Strand")
-colnames(tb.cov) <- c("Chr", "Pos", "Cov", "Strand")
-tb <- inner_join(tb.cov, tb.freq, by = c("Chr", "Pos", "Strand"))
-tb <- select(tb, Chr, Pos, Strand, Cov, Methyl_freq)
-
-# Accumulate Cpg sites on +'ve strand
-tb[tb$Strand == "-","Pos"] <- tb[tb$Strand == "-","Pos"]-1
+##################################### Combine methylation from both strands for a CpG site ####################################
+df_2 <- df
+# Accumulate CpG sites into +'ve strand
+df_2[df_2$Strand == "-","Pos_end"] <- df_2[df_2$Strand == "-","Pos_end"]-1
 # Use data.table to compute the mean of duplicated position while keeping non-duplicated sites
-tb <- data.table(tb)
-tb <- tb[,list(Methyl_freq = mean(Methyl_freq), 
-               Cov = sum(Cov)),
-               list(Chr,Pos)]
-tb <- data.frame(tb)
-
-write.table(tb, file=args[3],  quote = FALSE, sep = "\t", col.names = TRUE, row.names = FALSE)
+df_2 <- data.table(df_2)
+df_2 <- df_2[,list(Methylation = mean(Methylation), 
+                   Coverage = sum(Coverage)),
+             list(Chr, Pos_end)]
+df_2 <- data.frame(df_2)
+df_2$Pos_start <- df_2$Pos_end-1
+df_2 <- select(df_2, Chr, Pos_start, Pos_end,  Coverage, Methylation)
+df_2$Pos_start <- format(df_2$Pos_start, scientific = FALSE)
+df_2$Pos_end <- format(df_2$Pos_end, scientific = FALSE)
+write.table(df_2, file=args[4],  quote = FALSE, sep = "\t", col.names = TRUE, row.names = FALSE)

@@ -1,0 +1,17 @@
+ONT Guppy basecall server software version 4.4.2+9623c16, client-server API version 5.0.0
+log path:            megalodon_results/guppy_log
+chunk size:          2000
+chunks per runner:   512
+max queued reads:    2000
+num basecallers:     10
+num socket threads:  2
+max returned events: 50000
+cpu mode:             ON
+threads per caller:  4
+
+Config loaded:
+config file:               ./../../Lib/rerio/basecall_models/res_dna_r941_min_modbases_5mC_CpG_v001.cfg
+model file:                ./../../Lib/rerio/basecall_models/res_dna_r941_min_modbases_5mC_CpG_v001.jsn
+model version id           None
+adapter scaler model file: None
+Starting server on port: 35257

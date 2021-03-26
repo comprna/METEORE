@@ -3,9 +3,10 @@ rule combine_sites:
         freq="deepsignal_results/{sample}_deepsignal-freq-perCG-raw.tsv",
         script="script_in_snakemake/run_deepsignal.R"
     output:
-        "deepsignal_results/{sample}_deepsignal-freq-perCG.tsv"
+        file1="deepsignal_results/{sample}_deepsignal-freq-perCG.tsv",
+        file2="deepsignal_results/{sample}_deepsignal-freq-perCG-combStrand.tsv"
     shell:
-        "Rscript {input.script} {input.freq} {output}"
+        "Rscript {input.script} {input.freq} {output.file1} {output.file2}"
 
 rule create_input_for_comb_model:
     input:

@@ -44,9 +44,10 @@ rule combine_freq_and_cov:
         freq="tombo_results/{sample}_tombo-freq-only.tsv",
         cov="tombo_results/{sample}_tombo-cov-only.tsv"
     output:
-        "tombo_results/{sample}_tombo-freq-perCG.tsv"
+        file1="tombo_results/{sample}_tombo-freq-perCG.tsv",
+        file2="tombo_results/{sample}_tombo-freq-perCG-combStrand.tsv"
     shell:
-        "Rscript {input.script} {input.freq} {input.cov} {output}"
+        "Rscript {input.script} {input.freq} {input.cov} {output.file1} {output.file2}"
 
 rule extract_per_read_results:
     input:

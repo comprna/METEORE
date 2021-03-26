@@ -2,41 +2,44 @@
 
 # Author: Zaka Yuen, JCSMR, ANU
 # Created on July 2020
+# Modified on March 2021
 
 # This script is to:
 # -take the default aggregated modified base output (bedMethyl format) after running Megalodon for modified base detection
-# -combine the CpG methylation calls from both strands into a single strand for a CpG site
+# -generate 2 outputs:
+#   -Retain information form both strnds (chr, start, end, cov, methylation ,strand)
+#   -Combine information from both both strands (chr, start, end, cov, methylation)
+
 
 library(dplyr)
 library(data.table)
 
 args = commandArgs(trailingOnly=TRUE)
 
-# test if there is at least one argument: if not, return an error
-if (length(args)==0) {
-  stop("At least one argument must be supplied (input file).n", call.=FALSE)
-} else if (length(args)==1) {
-  # default output file
-  args[2] = "megalodon_freq-perCG.tsv"
-}
+df <- read.table(args[1], header = FALSE, sep = "\t", stringsAsFactors = TRUE)
+df <- df %>% select(1, 3, 6, 11, 10)
+colnames(df) <- c("Chr", "Pos_end", "Strand", "Methylation", "Coverage")
 
-df <- read.table(args[1], header = FALSE, sep = "\t")
-# Remove unnecessary columns
-df <- df  %>% select(1, 3, 6, 11, 10)
-colnames(df) <- c("Chr", "Pos", "Strand", "Methyl_freq", "Cov")
-# Convert %methylation into frequency 
-df[,"Methyl_freq"] <- df[,"Methyl_freq"]/100
+######################## Retain methylation on both strands for a CpG site ###########################
+df_1 <- df
+df_1$Pos_start <- df_1$Pos_end-1
+df_1 <- select(df_1, Chr, Pos_start, Pos_end, Coverage, Methylation, Strand)
+df_1$Pos_start <- format(df_1$Pos_start, scientific = FALSE)
+df_1$Pos_end <- format(df_1$Pos_end, scientific = FALSE)
+write.table(df_1, file=args[2],  quote = FALSE, sep = "\t", col.names = TRUE, row.names = FALSE)
 
-
-# Accumulate CpG sites into the +'ve strand
-df[df$Strand == "-","Pos"] <- df[df$Strand == "-","Pos"]-1
-
+########################## Combine methylation from both strands for a CpG site ########################
+df_2 <- df
+# Accumulate CpG sites into +'ve strand
+df_2[df_2$Strand == "-","Pos_end"] <- df_2[df_2$Strand == "-","Pos_end"]-1
 # Use data.table to compute the mean of duplicated position while keeping non-duplicated sites
-df <- data.table(df)
-#str(df)
-df <- df[,list(Methyl_freq = mean(Methyl_freq), 
-                Cov = sum(Cov)),
-                list(Chr,Pos)]
-df <- data.frame(df)
-df$Pos <- format(df$Pos,scientific=FALSE)
-write.table(df, file=args[2],  quote = FALSE, sep = "\t", col.names = TRUE, row.names = FALSE)
+df_2 <- data.table(df_2)
+df_2 <- df_2[,list(Methylation = mean(Methylation), 
+                   Coverage = sum(Coverage)),
+             list(Chr, Pos_end)]
+df_2 <- data.frame(df_2)
+df_2$Pos_start <- df_2$Pos_end-1
+df_2 <- select(df_2, Chr, Pos_start, Pos_end,  Coverage, Methylation)
+df_2$Pos_start <- format(df_2$Pos_start, scientific = FALSE)
+df_2$Pos_end <- format(df_2$Pos_end, scientific = FALSE)
+write.table(df_2, file=args[3],  quote = FALSE, sep = "\t", col.names = TRUE, row.names = FALSE)
