@@ -6,7 +6,8 @@
 METEORE provides snakemake pipelines for various tools to detect DNA methylation from Nanopore sequencing reads. Additionally, it provides
 new predictive models (random forest and multiple linear regression) that combine the outputs from the tools to produce a consensus prediction with higher accuracy than the individual tools.
 
-**NEW UPDATES (Mar-2021)**
+*NEW UPDATES (Mar-2021)*
+
 METEORE can now produce two per-site result files in an **augmented BED format** for each tool except for DeepMod (which will be updated very soon). The first output file contains the following fields:
 1. Reference chromosome
 2. Start position in chromosome
@@ -70,7 +71,7 @@ In the second output file, we combine the methylation predictions from both stra
 ----------------------------
 
 ![Analysis pipeline](https://github.com/comprna/METEORE/blob/master/figure/meteore_pipeline.png)
-**Fig 1. Pipeline for CpG methylation detection form nanopore sequencing data** All tools take the input fast5 files, detect modified bases (5-methylcytosine at CG dinucleotides in this case) in reads and predict per-site methylation frequency at genome level.
+**Fig 1. Pipeline for CpG methylation detection form nanopore sequencing data.** All tools take the input fast5 files, detect modified bases (5-methylcytosine at CG dinucleotides in this case) in reads and predict per-site methylation frequency at genome level.
 
 ----------------------------
 # Installation
@@ -101,14 +102,16 @@ We provide an example dataset `data/example` along with a genome reference `data
 
 **Run the pipelines with your own data:**
 - You can run the pipeline with your own dataset by replacing `example` folder in the `data` directory with your folder containing the fast5 files. You will use the **fast5 folder name** to specify your target output file in the Snakemake pipeline. Simply replace ***example*** in the output file with ***your fast5 folder name*** in the command line below.
-- You should place the reference genome file in *.fasta* format in a folder named `data`, and re-define the reference genome file within the Snakefile (`Nanopolish`, `Deepsignal`, `Tombo`, `Guppy`) by replacing `ecoli_k12_mg1655.fasta` with ***your specified reference genome***.
+- You should place the reference genome file in *.fasta* format in a folder named `data`, and re-define the reference genome file within the Snakefile (`Nanopolish`, `Deepsignal1`, `Tombo`, `Guppy`) by replacing `ecoli_k12_mg1655.fasta` with ***your specified reference genome***.
 
 
 ## Nanopolish snakemake pipeline
 
 ### Create and activate the Conda environment
 
-**Installing packages via Mamba**
+To install packages for Nanopolish pipeline, run one of the following:
+
+1. Installing packages via Mamba
 ```bash
 # Create an environment with Snakemake installed
 mamba create -c conda-forge -c bioconda -n meteore_nanopolish_env snakemake
@@ -118,7 +121,7 @@ conda activate meteore_nanopolish_env
 mamba install -c bioconda nanopolish samtools r-data.table r-dplyr r-plyr
 ```
 
-**Installing packages using .yml file**
+2. Installing packages using .yml file**
 ```
 mamba env create -f nanopolish.yml
 conda activate meteore_nanopolish_env
@@ -126,7 +129,7 @@ conda activate meteore_nanopolish_env
 
 ### Run the snakemake
 
-Before executing the workflow below, make sure you have the basecalled fastq file in the `METEORE` directory. Nanopolish needs to link the read ids from the fastq file with their signal-level data in the fast5 files. An example fastq file `example.fastq` is provided.
+Before executing the workflow below, make sure you have the ***basecalled fastq*** file in the `METEORE` directory. Nanopolish needs to link the read ids from the fastq file with their signal-level data in the fast5 files. An example fastq file `example.fastq` is provided.
 
 A Snakefile named `Nanopolish` contains all rules for the Snakemake workflow. Run the snakemake to create the output files:
 ```
@@ -143,11 +146,13 @@ NC_000913.3   3499546     +         -0.12           094dfe6b-23ed-4195-8876-805a
 NC_000913.3   3499563     +         8.26            094dfe6b-23ed-4195-8876-805a399fade5
 ```
 * `example_nanopolish-freq-perCG.tsv` stores **the final per-site data** in a augmented BED format where the first three columns represent:
+
   1. Reference chromosome
   2. Start position in chromosome
   3. End position in chromosome
 
 The remaining columns represent:
+
   4. Read coverage
   5. Methylation (i.e. methylation frequency)
   6. Strandedness
@@ -158,7 +163,9 @@ NC_000913.3     3503840     3503841   7           1             -
 NC_000913.3     3503849     3503850   7           1             +
 NC_000913.3     3503850     3503851   7           1             -
 ```
+
 * `example_nanopolish-freq-perCG-combStrand.tsv` also stores **the final per-site data** in the same augmented BED format but the methylation calls from both strands are merged into a single strand by averaging the methylation frequencies and adding up the coverage for a CpG site. Each column represents:
+
   1. Reference chromosome
   2. Start position in chromosome
   3. End position in chromosome
@@ -166,17 +173,17 @@ NC_000913.3     3503850     3503851   7           1             -
   5. Methylation (i.e. methylation frequency)
 ```
 Chr             Pos_start   Pos_end   Coverage    Methylation
-NC_000913.3	    3503839	    3503840	  14	       1
-NC_000913.3	    3503849	    3503850	  14	       1
+NC_000913.3     3503839     3503840   14          1
+NC_000913.3     3503849     3503850   14          1
 ```
 
 ### Prepare the input file for combined model usage (optional)
 
-You can also generate the per-read prediction output in a format that can be used in METEORE to generate a consensus prediction (see further below).
+You can also generate the **per-read** prediction output in a format that can be used in METEORE to generate a consensus prediction (see further below).
 ```
 snakemake -s Nanopolish nanopolish_results/example_nanopolish-perRead-score.tsv --cores all
 ```
-The output is in .tsv format and contains the following fields: `ID`,	`Chr`, `Pos`,	`Strand` and `Score`, e.g.:
+The output is in TSV format and contains the following fields: `ID`,	`Chr`, `Pos`,	`Strand` and `Score`, e.g.:
 ```
 ID                                      Chr             Pos       Strand    Score
 094dfe6b-23ed-4195-8876-805a399fade5    NC_000913.3     3499655   -         20.79
@@ -186,7 +193,8 @@ ID                                      Chr             Pos       Strand    Scor
 ## DeepSignal snakemake pipeline
 
 ### Create and activate the first Conda environment
-**Note: Two environments with Snakemake installed are required. The first is for Deepsignal itself. The second is to produce output files that are in the same format generated by other tools.**
+***Note: Two environments with Snakemake installed are required. The first is for Deepsignal itself. The second is to produce output files that are in the same format generated by other tools.***
+
 We will create and first Conda environment:
 ```bash
 # Here we install Python 3.6 with older version of Snakemake so we can install tensorflow==1.13.1 later
@@ -241,11 +249,13 @@ snakemake -s Deepsignal2 deepsignal_results/example_deepsignal-freq-perCG.tsv --
 ```
 **Two output files** will be produced and saved to the `deepsignal_results`directory:
 * `example_deepsignal-freq-perCG.tsv` stores **the final per-site data** in a augmented BED format where the first three columns represent:
+
   1. Reference chromosome
   2. Start position in chromosome
   3. End position in chromosome
 
 The remaining columns represent:
+
   4. Read coverage
   5. Methylation (i.e. methylation frequency)
   6. Strandedness
@@ -259,24 +269,25 @@ NC_000913.3     3501861     3501862   9           0.889         +
 NC_000913.3     3501862     3501863   8           0.875         -
 ```
 * `example_deepsignal-freq-perCG-combStrand.tsv` also stores **the final per-site data** in the same augmented BED format but the methylation calls from both strands are merged into a single strand by averaging the methylation frequencies and adding up the coverage for a CpG site. Each column represents:
+
   1. Reference chromosome
   2. Start position in chromosome
   3. End position in chromosome
   4. Read coverage
   5. Methylation (i.e. methylation frequency)
 ```
-Chr             Pos_start   Pos_end   Coverage    Methylation
-NC_000913.3	    3501827	    3501828	  17	        0.9445
-NC_000913.3	    3501840	    3501841	  17	        0.9375
-NC_000913.3	    3501861	    3501862	  17	        0.882
+Chr             Pos_start   Pos_end     Coverage    Methylation
+NC_000913.3     3501827     3501828     17          0.9445
+NC_000913.3     3501840     3501841     17          0.9375
+NC_000913.3     3501861     3501862     17          0.882
 ```
 
 ### Prepare the input file for combined model usage (optional)
-You can now generate the per-read prediction output in a format that can be used in METEORE to generate a consensus prediction (see further below). Note the uses of --cores in the newer version of Snakemake.
+You can now generate the **per-read** prediction output in a format that can be used in METEORE to generate a consensus prediction (see further below). Note the uses of --cores in the newer version of Snakemake.
 ```
 snakemake -s Deepsignal2 deepsignal_results/example_deepsignal-perRead-score.tsv --cores 1
 ```
-The output is in tsv format and contains the following fields: `ID`,	`Chr`, `Pos`,	`Strand` and `Score`.
+The output is in TSV format and contains the following fields: `ID`,	`Chr`, `Pos`,	`Strand` and `Score`.
 
 
 ## Tombo snakemake pipeline
@@ -313,6 +324,7 @@ There are rules in the Snakemake workflow for downstream processing of the outpu
 * `example_tombo-freq-only.tsv`: contains methylation frequency results from the wiggle files
 * `example_tombo-cov-only.tsv`: contains coverage data from the wiggle files
 * `example_deepsignal-freq-perCG.tsv` stores **the final per-site data** in a augmented BED format including the following fields:
+
   1. Reference chromosome
   2. Start position in chromosome
   3. End position in chromosome
@@ -320,6 +332,7 @@ There are rules in the Snakemake workflow for downstream processing of the outpu
   5. Methylation (i.e. methylation frequency)
   6. Strandedness
 * `example_deepsignal-freq-perCG-combStrand.tsv` also stores **the final per-site data** in the same augmented BED format but the methylation calls from both strands are merged into a single strand by averaging the methylation frequencies and adding up the coverage for a CpG site. Each column represents:
+
   1. Reference chromosome
   2. Start position in chromosome
   3. End position in chromosome
@@ -332,10 +345,11 @@ You can also generate the per-read prediction output in a format that can be use
 ```
 snakemake -s Tombo tombo_results/example_tombo-perRead-score.tsv
 ```
-The output is in tsv format and contains the following fields: `ID`,	`Chr`, `Pos`,	`Strand` and `Score`.
+The output is in TS format and contains the following fields: `ID`,	`Chr`, `Pos`,	`Strand` and `Score`.
 
-**Note:** This command can only extract per-read data for a region of interest. You need to go to ***script_in_snakemake/extract_tombo_per_read_results.py*** to specify your region of interest (chromosome, start position and end position) in the Python script and rerun the results.
-Open the Python script ***extract_tombo_per_read_results.py*** with an editor of your choice and go to line 21 to 23 of the file:
+**Note:**
+- This command can only extract per-read data for a region of interest. You need to go to ***script_in_snakemake/extract_tombo_per_read_results.py*** to specify your region of interest (chromosome, start position and end position) in the Python script and rerun the results.
+- Open the Python script ***extract_tombo_per_read_results.py*** with an editor of your choice and go to line 21 to 23 of the file:
 ```bash
 ######## specify region of interest below: ########
 chromosome = 'NC_000913.3'
@@ -403,8 +417,9 @@ NC_000913.3   +       3505726   3505727   8386596c-ff56-4032-b54e-8f062c194b16  
 NC_000913.3   +       3505728   3505729   8386596c-ff56-4032-b54e-8f062c194b16    0.361           -0.155                -0.516                  1                     1           CG
 NC_000913.3   +       3505745   3505746   8386596c-ff56-4032-b54e-8f062c194b16    -0.112          -0.359                -0.247                  1                     1           CG
 ```
+* `example_guppy-freq-perCG.tsv` stores **the final per-site data** in a augmented BED format including the following fields: `Chromosome`, `Start position`, `End position`, `Coverage`, `Methylation frequency` and `Strand`, which is in the same format generated by other tools.
 * `example_guppy-freq-perCG-combStrand.tsv` also stores **the final per-site data** in the same augmented BED format but the methylation calls from both strands are merged into a single strand by averaging the methylation frequencies and adding up the coverage for a CpG site. This output contains the following fields: `Chromosome`, `Start position`, `End position`, `Coverage` and `Methylation frequency`, which is in the same format generated by other tools.
-* `example_guppy-perRead-score.tsv` is a **per-read prediction** file containing five columns: `Read_ID`,	`Chromosome`, `Position`,	`Strand` and `Score`. This file can be used later in METEORE to generate a consensus prediction.
+* `example_guppy-perRead-score.tsv` is a **per-read** prediction file containing five columns: `Read_ID`,	`Chromosome`, `Position`,	`Strand` and `Score`. This file can be used later in METEORE to generate a consensus prediction.
 
 ### Prepare the input file for combined model usage (optional)
 
@@ -472,14 +487,14 @@ We have trained Random Forest models that combine the outputs from two of the me
 to produce consensus predictions with improved accuracy. We also provide the scripts to train new models with two
 or more methods.
 
-First, please make sure you install the required libraries in the conda env
+First, please make sure you install the required libraries in the Conda environment
 
 ```
 pip install -r requirements.txt
 ```
 
 ## Input file
-To make the predictions using the combination model (eg. ***deepSignal*** and ***nanopolish***), you can generate the per-read prediction input
+To make the predictions using the combination model (eg. ***DeepSignal*** and ***Nanopolish***), you can generate the per-read prediction input
 file `example_deepsignal-perRead-score.tsv` and `example_nanopolish-perRead-score.tsv` as described before in our snakemake pipelines.
 The input (.tsv) file from each method must be formatted as below:
 ```
