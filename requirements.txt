@@ -1,4 +1,5 @@
 numpy
 pandas
-Joblib
-scikit-learn
+cython
+Joblib==0.13.2
+scikit-learn==0.21.3
