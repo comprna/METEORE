@@ -55,11 +55,12 @@ In the second output file, we combine the methylation predictions from both stra
          * [Output files](#output-files)
       * [DeepMod](#deepmod)
    * [Combined model (random forest) usage](#combined-model-random-forest-usage)
-      * [## Prepare the per-read score file from the methods you select](##prepare-the-per-read-score-file-from-the-methods-you-select)
+      * [## Prepare the per-read score file from the methods you select](##prepare-the-per--read-score-file-from-the-methods-you-select)
       * [Command](#command)
       * [Per site predictions](#per-site-predictions)
       * [Train your own combination model](#train-your-own-combination-model)
    * [Combined model (multiple linear regression) usage](#combined-model-multiple-linear-regression-usage)
+      * [Training datasets](#training-datasets)
       * [Command and options](#command-and-options)
       * [Regression specific options](#regression-specific-options)
       * [Example run report](#example-run-report)
@@ -145,14 +146,11 @@ NC_000913.3   3499526     +         -0.33           094dfe6b-23ed-4195-8876-805a
 NC_000913.3   3499546     +         -0.12           094dfe6b-23ed-4195-8876-805a399fade5
 NC_000913.3   3499563     +         8.26            094dfe6b-23ed-4195-8876-805a399fade5
 ```
-* `example_nanopolish-freq-perCG.tsv` stores **the final per-site data** in a augmented BED format where the first three columns represent:
+* `example_nanopolish-freq-perCG.tsv` stores **the final per-site data** in a augmented BED format where the columns represent:
 
   1. Reference chromosome
   2. Start position in chromosome
   3. End position in chromosome
-
-The remaining columns represent:
-
   4. Read coverage
   5. Methylation (i.e. methylation frequency)
   6. Strandedness
@@ -248,14 +246,11 @@ Another Snakefile named `Deepsignal2` contains the rules for the Snakemake workf
 snakemake -s Deepsignal2 deepsignal_results/example_deepsignal-freq-perCG.tsv --cores 1
 ```
 **Two output files** will be produced and saved to the `deepsignal_results`directory:
-* `example_deepsignal-freq-perCG.tsv` stores **the final per-site data** in a augmented BED format where the first three columns represent:
+* `example_deepsignal-freq-perCG.tsv` stores **the final per-site data** in a augmented BED format where the columns represent:
 
   1. Reference chromosome
   2. Start position in chromosome
   3. End position in chromosome
-
-The remaining columns represent:
-
   4. Read coverage
   5. Methylation (i.e. methylation frequency)
   6. Strandedness
@@ -391,12 +386,9 @@ mv [original_fastq_file_with_long_filename] example.fq
 git clone https://github.com/kpalin/gcf52ref.git
 ```
 
-Then you can create the environment from the `guppy.yml` file:
+Then you can create and activate the environment from the `guppy.yml` file:
 ```
 mamba env create -f guppy.yml
-```
-Then activate the Conda environment:
-```
 conda activate guppy_cpg_snakemake
 ```
 
@@ -621,13 +613,16 @@ This command will use the model `rf_model_max_depth_3_n_estimator_10_deepsignal_
 # Combined model (multiple linear regression) usage
 ---------------------------------------------------
 
-An alternative combination model based on multiple linear regression (REG) is available through the meteore_reg.py script. This is
-a standalone script that first builds a model training data and then applies it to unknown test data generated from the same tools.
+An alternative combination model based on multiple linear regression (REG) is available through the `meteore_reg.py` script. This is a standalone script that first builds a model training data and then applies it to unknown test data generated from the same tools.
 It a simple script to run which requires upwards of 12 GB of RAM, and approximately five minutes for the data sets used in our publication.
+
+## Training datasets
+
+The METEORE REG model was trained on the *E.coli* datasets with 11 different mixture sets of methylated and unmethylated reads (0%, 10%,..., 90%, 100% of methylated reads), each set with ~2400 reads. Here we provide the training datasets of the three best performing tools (Nanopolish, DeepSignal, Megalodon) where you can download them from [figshare](https://figshare.com/articles/dataset/Per-read_scores_from_different_nanopore_methylation_tools_in_controlled_mixture_dataset_1/15081264).
 
 ## Command and options
 
-The example usage below would train the REG model on Nanopolish and DeepSignal outputs from the "mix1" data set, and apply
+The example usage below would train the REG model on Nanopolish and DeepSignal outputs from the "mix1" dataset, and apply
 this model to the data in "mix2" for the same tools. Inputs and outputs rely on the ordering of arguments to remain consistent.
 
 ```
