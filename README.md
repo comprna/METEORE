@@ -614,11 +614,12 @@ This command will use the model `rf_model_max_depth_3_n_estimator_10_deepsignal_
 ---------------------------------------------------
 
 An alternative combination model based on multiple linear regression (REG) is available through the `meteore_reg.py` script. This is a standalone script that first builds a model training data and then applies it to unknown test data generated from the same tools.
-It a simple script to run which requires upwards of 12 GB of RAM, and approximately five minutes for the data sets used in our publication.
+It's a simple script to run but requires upwards of 6 GB of RAM, and approximately five minutes for the data sets used in our publication.
 
 ## Training datasets
 
 The METEORE REG model was trained on the *E.coli* datasets with 11 different mixture sets of methylated and unmethylated reads (0%, 10%,..., 90%, 100% of methylated reads), each set with ~2400 reads. Here we provide the training datasets of the three best performing tools (Nanopolish, DeepSignal, Megalodon) where you can download them from [figshare](https://figshare.com/articles/dataset/Per-read_scores_from_different_nanopore_methylation_tools_in_controlled_mixture_dataset_1/15081264).
+The minimum needed for training is to have two mixture proportions that are known.
 
 ## Command and options
 

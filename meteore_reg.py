@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 from sklearn.linear_model import RidgeCV
 #from skleanr.linear_model import Ridge, LinearRegression, SGDRegressor,\
 #        ElasticNet, Lars, Lasso, ARDRegression, BayesianRidge, HuberRegressor,\
@@ -14,61 +12,65 @@ import sys
 from math import floor
 from argparse import ArgumentParser as AP
 from collections import Counter
-import gzip
-
-"""
-Author: Cameron Jack, ANU Bioinformatics Consultancy, Australian National University (ANU)
-Created: Sept 2020
-Copyright: Cameron Jack, Zaka (Wing-Sze) Yuen, Eduardo Eyras, ANU 2020.
-
-Multiple regression approach to combining Nanopore methylation prediction from multiple tools.
-Truth group (label), read ID and locus must be shared across all inputs.
-
-TODO: imputation of missing loci. Also, trying a simple linear regression model would be interesting.
-"""
-
-def myopen(fn):
-    """ Bob's Buckley's function to handle gzip transparently """
-    if fn.endswith('.gz') :
-        return gzip.open(fn, 'rt')
-    return open(fn, errors='ignore')
 
 
 def parse_training_loci(fn):
-    """ Get all reads and positions to check for overlap before reading values """
-    with myopen(fn) as f:
-        group_read_pos = set()
+    """ 
+    Get all reads and positions to check for overlap before reading values. 
+    Expects to get a Chr column after ReadID and before Pos, but will cope if it's missing
+    """
+    with open(fn, 'rt') as f:
+        group_read_chrom_pos = set()
+        no_chrom = False
         for i, row in enumerate(f):
             if i == 0:
+                if 'chr' not in row.lower():
+                    no_chrom = True
                 continue
             cols = row.strip().split('\t')
             group = int(cols[0].strip().replace('m',''))
             read = cols[1].strip()
-            pos = int(cols[2].strip())
-            entry = (group, read, pos)
-            if entry in group_read_pos:
+            if no_chrom:
+                chrom = '.'
+                pos = int(cols[2].strip())
+            else:
+                chrom = cols[2].strip()
+                pos = int(cols[3].strip())
+            entry = (group, read, chrom, pos)
+            if entry in group_read_chrom_pos:
                 print (fn, 'duplicate group, read, position:', entry)
-            group_read_pos.add(entry)
-    return group_read_pos
+            group_read_chrom_pos.add(entry)
+    return group_read_chrom_pos
 
 
 def parse_training_values(fn, shared_ids, trunc_score_min, trunc_score_max, debug=False):
-    """ parse file contents into dictionary of [(group,read,pos)] = (strand, label, prediction, score) """
+    """ parse file contents into dictionary of [(group,read,chrom,pos)] = (strand, label, prediction, score) """
     truncated = 0
     contents = {}
-    with myopen(fn) as f:
+    no_chrom = False
+    with open(fn, 'rt') as f:
         for i, row in enumerate(f):
             if i == 0:
+                if 'chr' not in row.lower():
+                    no_chrom = True
                 continue
             cols = row.strip().split('\t')
             group = int(cols[0].strip().replace('m',''))
             read = cols[1].strip()
-            pos = int(cols[2].strip())
-            if (group, read, pos) in shared_ids:
-                strand = 1 if cols[3].strip() == '+' else 0
-                label = 1 if cols[4].strip() == 'yes' else 0  # truth
-                predicted = 1 if cols[5].strip() == 'yes' else 0
-                score = float(cols[6].strip())
+            if no_chrom:
+                chrom = '.'
+                pos = int(cols[2].strip())
+            else:
+                chrom = cols[2].strip()
+                pos = int(cols[3].strip())
+            if (group, read, chrom, pos) in shared_ids:
+                starting_index = 3
+                if not no_chrom:
+                    starting_index += 1
+                strand = 1 if cols[starting_index].strip() == '+' else 0
+                label = 1 if cols[starting_index+1].strip() == 'yes' else 0  # truth
+                predicted = 1 if cols[starting_index+2].strip() == 'yes' else 0
+                score = float(cols[starting_index+3].strip())
                 if trunc_score_max:
                     if score > trunc_score_max:
                         score = trunc_score_max
@@ -77,7 +79,7 @@ def parse_training_values(fn, shared_ids, trunc_score_min, trunc_score_max, debu
                     if score < trunc_score_min:
                         score = trunc_score_min
                         truncated += 1
-                contents[(group, read, pos)] = (strand, label, predicted, score)
+                contents[(group, read, chrom, pos)] = (strand, label, predicted, score)
     if debug:
         print(truncated, 'scores truncated', file=sys.stderr)
     return contents
@@ -85,19 +87,27 @@ def parse_training_values(fn, shared_ids, trunc_score_min, trunc_score_max, debu
 
 def parse_test_loci(fn):
     """ Parse test data (doesn't contain known outcomes or groups) """
-    with myopen(fn) as f:
-        read_pos = set()
+    with open(fn, 'rt') as f:
+        read_chrom_pos = set()
+        no_chrom = False
         for i, row in enumerate(f):
             if i == 0:
+                if 'chr' not in row.lower():
+                    no_chrom = True
                 continue
             cols = row.strip().split('\t')
             read = cols[0].strip()
-            pos = int(cols[1].strip())
-            entry = (read, pos)
-            if entry in read_pos:
+            if no_chrom:
+                chrom = '.'
+                pos = int(cols[1].strip())
+            else:
+                chrom = cols[1].strip()
+                pos = int(cols[2].strip())
+            entry = (read, chrom, pos)
+            if entry in read_chrom_pos:
                 print (fn, 'duplicate read, position:', entry)
-            read_pos.add(entry)
-    return read_pos
+            read_chrom_pos.add(entry)
+    return read_chrom_pos
 
 
 def parse_test_values(fn, shared_ids, trunc_score_min, trunc_score_max, debug=False):
@@ -110,16 +120,28 @@ def parse_test_values(fn, shared_ids, trunc_score_min, trunc_score_max, debug=Fa
     """
     truncated = 0
     contents = {}
-    with myopen(fn) as f:
+    no_chrom = False
+    with open(fn, 'rt') as f:
         for i, row in enumerate(f):
             if i == 0:
+                if 'chr' not in row.lower():
+                    no_chrom = True
                 continue
             cols = row.strip().split('\t')
             read = cols[0].strip()
-            pos = int(cols[1].strip())
-            if (read, pos) in shared_ids:
-                strand = 1 if cols[2].strip() == '+' else 0
-                score = float(cols[3].strip())
+            if no_chrom:
+                chrom = '.'
+                pos = int(cols[1].strip())
+            else:
+                chrom = cols[1].strip()
+                pos = int(cols[2].strip())
+            if (read, chrom, pos) in shared_ids:
+                if no_chrom:
+                    strand = 1 if cols[2].strip() == '+' else 0
+                    score = float(cols[3].strip())
+                else:
+                    strand = 1 if cols[3].strip() == '+' else 0
+                    score = float(cols[4].strip())
                 if trunc_score_max:
                     if score > trunc_score_max:
                         score = trunc_score_max
@@ -128,7 +150,7 @@ def parse_test_values(fn, shared_ids, trunc_score_min, trunc_score_max, debug=Fa
                     if score < trunc_score_min:
                         score = trunc_score_min
                         truncated += 1
-                contents[(read, pos)] = (strand, score)
+                contents[(read, chrom, pos)] = (strand, score)
     if debug:
         print(truncated, 'scores were truncated', file=sys.stderr)
     return contents
@@ -170,7 +192,7 @@ def count_success(critical_value, value_array, method_name, training_desc, test_
     if include_pred:
         fn = fn.replace('.tsv','_inc_pred.tsv')
     with open(fn, 'wt') as out:
-        print('\t'.join(map(str,['Group','Read','Pos','Strand','Label','Prediction','Score'])), file=out)
+        print('\t'.join(map(str,['Group','Read','Chrom','Pos','Strand','Label','Prediction','Score'])), file=out)
         for i, s in enumerate(value_array[:,-1]):
             if s > filter_min and s < filter_max:
                 total_ignored += 1
@@ -194,21 +216,21 @@ def count_success(critical_value, value_array, method_name, training_desc, test_
             else:
                 # unmethylated
                 c = 0
-            group, read, pos = id_list[i]
+            group, read, chrom, pos = id_list[i]
             # 0 truth/label
             # 1 strand
             # 2 score - t1
             # 3 score - t2
             # 4 prediction - t1
             # 5 prediction - t2
-            # 6 np.arange(0,len(shared_ids),dtype=np.float)
+            # 6 np.arange(0,len(shared_ids),dtype=np.single)
             # 7 predicted_values
             strand = value_array[i,1]
             label = value_array[i,0]
             c_str = 'no' if c == 0 else 'yes'
             strand_str = '-' if strand == 0 else '+'
             label_str = 'no' if label == 0 else 'yes'
-            print('\t'.join(map(str,[group,read,pos,strand_str,label_str,c_str,s])), file=out)
+            print('\t'.join(map(str,[group,read,chrom,pos,strand_str,label_str,c_str,s])), file=out)
     return success, total_ignored
     
 
@@ -217,7 +239,7 @@ def load_training_data(training_fns, trunc_min_scores,
     """ First parse group, read and position to find shared data points
         Then read in training scores, truncating as appropriate """
     # Parse file twice. First time get all the loci, second time all the value data
-    training_ids = [parse_training_loci(t_fn) for t_fn in training_fns]
+    training_ids = [parse_training_loci(t_ids) for t_ids in training_fns]
     shared_ids = set.intersection(*training_ids)
     id_list = sorted(shared_ids)
     if debug:
@@ -230,8 +252,8 @@ def load_training_data(training_fns, trunc_min_scores,
     # 2+2*len(train) or -2, numeric order
     # 3+2*len(train) or -1, model predicted score
     groups = len(training_fns)
-    value_array = np.zeros((len(shared_ids),4+(2*groups)), dtype=np.float)
-    value_array[:,-2] = np.arange(0,len(shared_ids), dtype=np.float)
+    value_array = np.zeros((len(shared_ids),4+(2*groups)), dtype=np.single)
+    value_array[:,-2] = np.arange(0,len(shared_ids), dtype=np.single)
     for index, (training_fn, t_min, t_max) in \
             enumerate(zip(training_fns, trunc_min_scores, trunc_max_scores)):
         # Read in values
@@ -251,7 +273,7 @@ def load_test_data(test_fns, trunc_min_scores,
     """ First parse group, read and position to find shared data points
         Then read in test scores, truncating as appropriate """
     # Parse file twice. First time get all the loci, second time all the value data
-    test_ids = [parse_test_loci(t_fn) for t_fn in test_fns]
+    test_ids = [parse_test_loci(t_ids) for t_ids in test_fns]
     shared_ids = set.intersection(*test_ids)
     id_list = sorted(shared_ids)
     if debug:
@@ -262,8 +284,8 @@ def load_test_data(test_fns, trunc_min_scores,
     # 1+len(train) or -2, numeric order
     # 2+len(train) or -1, model predicted score
     groups = len(test_fns)
-    value_array = np.zeros((len(shared_ids),3+(groups)), dtype=np.float)
-    value_array[:,-2] = np.arange(0,len(shared_ids), dtype=np.float)
+    value_array = np.zeros((len(shared_ids),3+(groups)), dtype=np.single)
+    value_array[:,-2] = np.arange(0,len(shared_ids), dtype=np.single)
     for index, (test_fn, t_min, t_max) in \
             enumerate(zip(test_fns, trunc_min_scores, trunc_max_scores)):
         # Read in values
@@ -293,7 +315,7 @@ def scale_data(value_array, groups, score_index, trunc_min, trunc_max):
     start = score_index
     stop = score_index + groups
     x, y = value_array[:,start:stop].shape
-    scores = np.zeros((x+2,y), dtype=np.float)  # need 2 extra rows, for min and max
+    scores = np.zeros((x+2,y), dtype=np.single)  # need 2 extra rows, for min and max
     scores[:x,:] = value_array[:,start:stop]
     for i in range(groups):
         scores[x,i] = trunc_min[i] if trunc_min[i] is not None else -5 
@@ -462,7 +484,7 @@ def main():
             if args.inc_pred:
                 fn = fn.replace('.tsv','_inc_pred.tsv')
             with open(fn, 'wt') as out:
-                print('\t'.join(map(str,['Read','Pos','Strand','Score','Prediction'])), file=out)
+                print('\t'.join(map(str,['Read','Chrom','Pos','Strand','Score','Prediction'])), file=out)
                 for i, s in enumerate(value_array[:,-1]):
                     if s > filter_min and s < filter_max:
                         total_ignored += 1
@@ -471,14 +493,14 @@ def main():
                         c = 1  #  methylated
                     else:
                         c = 0  # unmethylated
-                    read, pos = id_list[i]
+                    read, chrom, pos = id_list[i]
                     # 0 strand
                     # 1: scores - t1
                     # -1 predicted_values
                     strand = value_array[i,0]
                     c_str = 'no' if c == 0 else 'yes'
                     strand_str = '-' if strand == 0 else '+'
-                    print('\t'.join(map(str,[read,pos,strand_str,s,c_str])), file=out)
+                    print('\t'.join(map(str,[read,chrom,pos,strand_str,s,c_str])), file=out)
         
 
 if __name__ == '__main__':
