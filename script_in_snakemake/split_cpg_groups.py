@@ -43,15 +43,16 @@ with open(snakemake.input[0],'r') as fh:
         elif cpg_num > 1:
             # index = []
             # pos.append(start)
-            for match in  re.finditer(target, seq):
-                #print(match.start())
+            out.write(chrom + "\t" + str(start) + "\t" + strand + "\t" + str(logRatio) + "\t" + read_name + "\n")
+            for match in re.finditer(target, seq):
+                # print(match.start())
                 index.append(match.start())
                 length = len(index)
             for i in range(1, length):
                 new_start = start + (index[i] - index[0])
                 # pos.append(new_start)
                 out.write(chrom + "\t" + str(new_start) + "\t" + strand + "\t" + logRatio + "\t" + read_name + "\n")
-                #print(new_start)
+                # print(new_start)
             '''
             ch.extend([chrom] * cpg_num)
             st.extend([strand] * cpg_num)
