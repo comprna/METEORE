@@ -1,0 +1,54 @@
+Building DAG of jobs...
+Using shell: /bin/bash
+Provided cores: 12
+Rules claiming more threads will be scaled down.
+Conda environments: ignored
+Job stats:
+job                    count    min threads    max threads
+-------------------  -------  -------------  -------------
+calculate_frequency        1              1              1
+call_methylation           1              1              1
+index                      1              1              1
+minimap2                   1              6              6
+samtools_index             1              1              1
+samtools_sort              1              1              1
+split_cpgs                 1              1              1
+total                      7              1              6
+
+Select jobs to execute...
+
+[Wed May 18 21:15:02 2022]
+rule minimap2:
+    input: data/ecoli_k12_mg1655.fasta, example.fastq
+    output: nanopolish_results/mapped/example.bam
+    log: nanopolish_results/mapped/example.log
+    jobid: 4
+    wildcards: sample=example
+    threads: 6
+    resources: tmpdir=/tmp
+
+[Wed May 18 21:15:02 2022]
+rule index:
+    input: data/example, example.fastq
+    output: example.fastq.index, example.fastq.index.fai, example.fastq.index.gzi, example.fastq.index.readdb
+    jobid: 6
+    wildcards: sample=example
+    resources: tmpdir=/tmp
+
+[Wed May 18 21:15:02 2022]
+Finished job 6.
+1 of 7 steps (14%) done
+[Wed May 18 21:15:03 2022]
+Error in rule minimap2:
+    jobid: 4
+    output: nanopolish_results/mapped/example.bam
+    log: nanopolish_results/mapped/example.log (check log file(s) for error message)
+
+RuleException:
+CalledProcessError in line 25 of /home/admin/comprna/METEORE/Nanopolish:
+Command 'set -euo pipefail;  /home/admin/Lib/anaconda3/envs/meteore_nanopolish_env/bin/python3.10 /home/admin/comprna/METEORE/.snakemake/scripts/tmpsrsmp6bt.wrapper.py' returned non-zero exit status 1.
+  File "/home/admin/comprna/METEORE/Nanopolish", line 25, in __rule_minimap2
+  File "/home/admin/Lib/anaconda3/envs/meteore_nanopolish_env/lib/python3.10/concurrent/futures/thread.py", line 58, in run
+Shutting down, this might take some time.
+Exiting because a job execution failed. Look above for error message
+Complete log: .snakemake/log/2022-05-18T211502.359090.snakemake.log
