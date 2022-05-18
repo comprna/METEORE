@@ -119,7 +119,7 @@ mamba create -c conda-forge -c bioconda -n meteore_nanopolish_env snakemake
 # Activate
 conda activate meteore_nanopolish_env
 # Install all required conda packages with mamba
-mamba install -c bioconda nanopolish samtools r-data.table r-dplyr r-plyr
+mamba install -c bioconda nanopolish minimap2 samtools r-data.table r-dplyr r-plyr
 ```
 
 2. Installing packages using .yml file**
