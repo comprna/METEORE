@@ -22,7 +22,7 @@ rule minimap2: # snakemake wrappers for minimap2
         extra="-a -x map-ont"
     threads: 6
     wrapper:
-        "0.66.0/bio/minimap2/aligner"
+        "v1.5.0/bio/minimap2/aligner"
 
 rule samtools_sort:
     input:
