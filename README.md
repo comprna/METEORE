@@ -423,20 +423,27 @@ The output is in tsv format and contains the following fields: `ID`,	`Chr`, `Pos
 
 ## Megalodon
 
-We did not develop a snakemake pipeline for Megalodon as it can be run with a single command.
+We did not develop a snakemake pipeline for Megalodon as it can basecall, map, detect base modifications with **Guppy** (GPU on Linux) and **Remora** running backend, using a single command.
 
-Please check out [Megalodon GitHub Page](https://github.com/nanoporetech/megalodon) and [Megalodon's documentation](https://nanoporetech.github.io/megalodon/) for more details. Note that the new release of Megalodon requires Guppy basecaller (version >= 4.0) to be installed to run Megalodon for the basecalling step. It uses Guppy (GPU on Linux) by default.
+Please check out [Megalodon GitHub Page](https://github.com/nanoporetech/megalodon) and [Megalodon's documentation](https://nanoporetech.github.io/megalodon/) for more details.
 
 ### Modified base detection
 
-Here we used the most recent basecalling models in **Rerio** that provides a more accurate methylation result than the original model. See [Rerio](https://github.com/nanoporetech/rerio) for installation and usage.
+Here we used the most recent modified basecalling models in **Remora** that provides the most accurate methylation result. See [Remora](https://github.com/nanoporetech/remora) for installation and usage.
+
+We tested with Megalodon (v2.5.0), Guppy (v6.1.1, GPU on linux), Remora (v1.0.0). GPU resources are required.
+
 ```
-megalodon data/example/ --outputs mods --reference data/ecoli_k12_mg1655.fasta --mod-motif m CG 0 --write-mods-text --processes 10 --guppy-server-path /<path_to_ont-guppy-gpu>/bin/guppy_basecall_server --guppy-params "d ./<path_to_rerio>/basecall_models/ --num_callers 5 --ipc_threads 6" --guppy-config res_dna_r941_min_modbases_5mC_CpG_v001.cfg --devices cuda:0 --overwrite
+megalodon data/example/ \
+--outputs basecalls mappings mod_mappings per_read_mods mods \
+--guppy-config dna_r9.4.1_450bps_hac.cfg \
+--guppy-server-path <path_to_ont-guppy-gpu>/bin/guppy_basecall_server \
+--reference data/ecoli_k12_mg1655.fasta \
+--remora-modified-bases dna_r9.4.1_e8 hac 0.0.0 5mc CG 0 \
+--overwrite --mod-motif m CG 0  --write-mods-text \
+--devices "cuda:all" --processes 20
 ```
-However, you can use Megalodon with Guppy (CPU on Linux), but you need to specify the `--guppy-timeout` argument to allow sufficient time for calling a read during CPU basecalling. Depending on your reads/datasets, you need to adjust the time. Here we use 400 seconds.
-```
-megalodon data/example/ --outputs mods --reference data/ecoli_k12_mg1655.fasta --mod-motif m CG 0 --write-mods-text --processes 10 --guppy-server-path ./<path_to_ont-guppy-cpu>/bin/guppy_basecall_server --guppy-params "-d ./<path_to_rerio>/basecall_models/ --num_callers 10" --guppy-timeout 400 --guppy-config res_dna_r941_min_modbases_5mC_CpG_v001.cfg --overwrite
-```
+
 The `megalodon` command produces the `megalodon_results` directory containing logs, per-read modified base output `per_read_modified_base_calls.txt`, per-site modified base output `modified_bases.5mC.bed`.
 
 ### Output files
