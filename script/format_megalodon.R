@@ -14,7 +14,7 @@ args = commandArgs(trailingOnly=TRUE)
 df <- read.table(args[1], header = TRUE, sep = "\t", stringsAsFactors = TRUE)
 df <- df %>% select(1,2,4,3,5,6)
 df$Score <- df$mod_log_prob - df$can_log_prob
-df <- df %>% select(1,2,3,4,6)
+df <- df %>% select(1,2,3,4,7)
 colnames(df) <- c("ID", "Chr", "Pos", "Strand", "Score")
 df <- df %>% mutate(Strand = if_else(Strand == 1, "+", "-"))
 df[,"Pos"] <- df[,"Pos"]+1
